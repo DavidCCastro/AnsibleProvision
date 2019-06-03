@@ -1,0 +1,12 @@
+[program:{{ smartlis_backend_supervisor_service }}]
+command={{ smartlis_backend_path }}/venv/bin/uwsgi {{ smartlis_backend_etc_path }}/uwsgi.ini
+user={{ smartlis_user }}
+autostart=true
+autorestart=true
+stdout_logfile={{ smartlis_backend_log_path }}/stdout.log
+stdout_logfile_maxbytes={{ smartlis_backend_outlog_maxbytes }}
+stdout_logfile_backups={{ smartlis_backend_outlog_backups }}
+stdout_capture_maxbytes={{ smartlis_backend_outcap_maxbytes }}
+stderr_logfile={{ smartlis_backend_log_path }}/stderr.log
+stderr_logfile_maxbytes={{ smartlis_backend_errlog_maxbytes }}
+stderr_logfile_backups={{ smartlis_backend_errlog_backups }}

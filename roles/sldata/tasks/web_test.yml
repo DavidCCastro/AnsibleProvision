@@ -1,0 +1,19 @@
+- hosts: sldatabase
+  user: smartlis
+    
+  tasks:
+  - name: Check sys calls count
+    uri:
+      url: http://192.1.1.220/exec/monitor_syscalllog_Ansible
+      return_content: yes
+    register: response_time
+  
+  - name: Send message when sys calls count is greater than 250 in the last hour
+    delegate_to: localhost
+    slack:
+      token: T9N25BYMC/BAX8DKSA3/Z8MVCo8SjbZnAMZJiPxKy4H5
+      msg: "{{ item }} Número llamadas sistema superior a 30 segundos"
+    when: "'{{ item }}' in response_time.content"
+    with_items:
+      - Warning
+      - Danger

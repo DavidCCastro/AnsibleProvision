@@ -1,0 +1,68 @@
+---
+
+- name: "[Slapp] | install apt deps"
+  apt:
+    name: "{{ slapp_apt_packages }}"
+    state: present
+    update_cache: yes
+
+- name: "[Slapp] | install pip packages"
+  pip:
+    name: "{{ slapp_pip_packages }}"
+    state: present
+
+- name: "[Slapp] | create needed dirs"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+  loop: "{{ slapp_needed_dirs }}"
+
+# - name: "[Slapp] | Download backend archive"
+#   get_url:
+#     url: "{{ smartlis_backend_url }}" 
+#     dest: "{{ smartlis_backend_path }}"
+#     owner: "{{ smartlis_user }}"
+#     group: "{{ smartlis_group }}"
+
+- name: "[Slapp] | extract backend archive"
+  become_user: "{{ smartlis_user }}"
+  unarchive:
+# better we check if the version is the same
+    creates: "{{ smartlis_backend_exclude_path }}"
+#    src: "{{ smartlis_backend_path }}/{{ smartlis_backend_archive_name }}"
+    src: "{{ smartlis_backend_archive_src }}"
+    dest: "{{ smartlis_backend_path }}"
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+    remote_src: "{{ smartlis_backend_remote_src }}"
+    
+
+- name: "[Slapp] | pip install requirements in venv"
+  become_user: "{{ smartlis_user }}"
+  pip:
+    virtualenv: "{{ smartlis_backend_venv }}"
+    requirements: "{{ smartlis_backend_venv_requirements }}"
+    state: present
+
+- name: "[Slapp] | apply needed patch"
+  become_user: "{{ smartlis_user }}"
+  patch:
+    basedir: "{{ item.basedir }}"
+    strip: "{{ item.strip }}"
+    src: "{{ item.src }}"
+    remote_src: "{{ item.remote_src }}"
+  loop: "{{ smartlis_backend_patches }}"
+
+- name: "[Slapp] | Install fonts"
+  become_user: "{{ smartlis_user }}"
+  unarchive:
+    creates: "{{ smartlis_backend_fonts_exclude_path }}"
+    src: "{{ smartlis_backend_fonts_src }}"
+    dest: "{{ smartlis_backend_fonts_path }}"
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+    remote_src: "{{ smartlis_backend_fonts_remote_src }}"
+
+

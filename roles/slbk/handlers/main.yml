@@ -1,0 +1,6 @@
+---
+# handlers file for slbk
+
+- name: reload nfs-kernel-server
+  become_user: root
+  service: name=nfs-kernel-server state=reloaded

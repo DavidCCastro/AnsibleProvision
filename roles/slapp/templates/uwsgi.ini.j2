@@ -1,0 +1,24 @@
+[uwsgi]
+chdir= {{ smartlis_backend_path }}/sl_root/
+home= {{ smartlis_backend_path }}/venv/
+wsgi-file = dj_site/wsgi.py
+{% if smartlis_backend_http_socket %}http-{% endif %}socket = {{ smartlis_backend_uwsgi_cidr }}
+stats = {{ smartlis_backend_uwsgi_stats_cidr }}
+{% if smartlis_backend_uwsgi_stats_http %}
+stats-http
+{% endif %}
+{% if smartlis_backend_http_cidr is defined %}
+http = {{ smartlis_backend_http_cidr }}
+{% endif %}
+master = True
+processes = {{ smartlis_backend_uwsgi_processes }}
+threads = {{ smartlis_backend_uwsgi_threads }}
+harakiri = 300
+max_requests = {{ smartlis_backend_uwsgi_max_requests }}
+vacuum = True
+buffer-size = {{ smartlis_backend_uwsgi_buffer_size }}
+; If app is not started quit.
+; So that supervisor can restart.
+; For instance when app is started before databases it quits and then supervisor retries.
+need-app = True
+lazy-apps = True

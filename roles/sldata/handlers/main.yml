@@ -1,0 +1,13 @@
+---
+# handlers file for sldata
+- name: restart postgresql
+  become_user: root
+  service:
+    name: postgresql
+    state: restarted
+
+- name: restart couchdb
+  become_user: root
+  service:
+    name: couchdb
+    state: restarted

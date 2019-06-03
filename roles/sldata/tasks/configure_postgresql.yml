@@ -1,0 +1,68 @@
+---
+
+- name: Install psycopg2
+  apt: 
+    name: "{{ sldata_psycopg_version }}"
+    state: present
+
+- name: "Create {{ sldata_psql_data_path }}"
+  file:
+    path: "{{ sldata_psql_data_path }}"
+    state: directory
+    owner: "{{ sldata_psql_owner }}"
+    group: "{{ sldata_psql_group }}"
+
+- name: Get current data dir of Postgresql
+  become_user: postgres
+  command: psql -c "show data_directory;"
+  register: result_query
+
+- name: Display example table contents
+  set_fact:
+    current_dir: "{{ result_query.stdout_lines[2].strip() }}"
+
+- name: Remove default instance of postgres
+  become_user: postgres
+  shell: "pg_dropcluster --stop {{ sldata_postgres_version }} {{ sldata_postgres_cluster }}"
+  when: sldata_postgres_delete_currentDB
+
+
+- name: Recreate postgres instance in the correct path
+  become_user: postgres
+  shell: "pg_createcluster  --start {{ sldata_postgres_version }} {{ sldata_postgres_cluster }} -d {{ sldata_psql_data_path }}"
+  when: sldata_postgres_delete_currentDB
+
+- name: start postgresql service
+  service:
+    name: postgresql
+    state: started
+
+- name: Create postgres smartlis user
+  become_user: postgres
+  postgresql_user:
+    name: "{{sldata_postgres_user}}"
+    password: "{{ psql_user_pass }}"
+    role_attr_flags: "{{ sldata_psql_user_role }}"
+
+- name: Apply pg_hba template
+  become_user: postgres
+  notify: restart postgresql
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ sldata_psql_conf_path }}/pg_hba.conf"
+    mode: 0644
+
+- name: Forece notify handler
+  meta: flush_handlers
+
+- name: Apply postgresql.conf template
+  become_user: postgres
+  notify: restart postgresql
+  template:
+    src: postgresql.conf.j2
+    dest: "{{ sldata_psql_conf_path }}/postgresql.conf"
+    mode: 0644
+
+
+
+

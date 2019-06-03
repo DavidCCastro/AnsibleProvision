@@ -1,0 +1,11 @@
+---
+
+- name: "[Slapp] | Start supervisord"
+  systemd:
+    name: "supervisor"
+    enabled: true
+
+- name: "[Slapp] | Start the backend"
+  supervisorctl:
+    name: "{{ smartlis_backend_supervisor_service }}"
+    state: started

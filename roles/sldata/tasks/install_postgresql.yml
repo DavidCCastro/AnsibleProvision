@@ -1,0 +1,22 @@
+---
+
+- name: Add postgres repo key
+  apt_key:
+    url: "{{ sldata_postgres_repo_key }}"
+    state: present
+
+- name: Add postgresql repo
+  apt_repository:
+    repo: "{{ sldata_postgres_repo }}"
+    state: present
+
+- name: Install postgresql
+  apt:
+    name: "postgresql-{{ sldata_postgres_version }}"
+    state: present
+    update_cache: yes
+
+- name: Check postgresql is started
+  service:
+    name: postgresql
+    state: started

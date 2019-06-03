@@ -1,0 +1,50 @@
+- hosts: "{{ sldata_master }}"
+  user: smartlis
+  become: yes
+  become_method: sudo
+  
+  tasks:
+  - name: Edit /etc/postgresql/9.6/main/postgresql.conf to enable WAL
+    lineinfile:
+      path: /etc/postgresql/9.6/main/postgresql.conf
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    with_items:
+      - { regexp: "#wal_level = minimal", line: "wal_level = archive" }
+      - { regexp: "#archive_mode = off", line: "archive_mode = on" }
+      - { regexp: "#archive_command = ''", line: "archive_command = 'cp %p /mnt/data/postgresql/9.6/main/archive/%f'" }
+      - { regexp: "#max_wal_senders = 0", line: "max_wal_senders = 5" }
+      - { regexp: "#wal_keep_segments = 0", line: "wal_keep_segments = 32" }
+      
+  - name: Create archive directory
+    become: yes
+    become_user: postgres
+    become_method: sudo
+    file:
+      path: /mnt/data/postgresql/9.6/main/archive
+      state: directory
+      owner: postgres
+      group: postgres
+      mode: 0700
+  
+  - name: Edit /etc/postgresql/9.6/main/pg_hba.conf to enable replication
+    lineinfile:
+      path: /etc/postgresql/9.6/main/pg_hba.conf
+      regexp: '^# Allow replication connections from localhost, by a user with the'
+      insertafter: '^# Allow replication connections from localhost, by a user with the'
+      line: 'host     replication     replication     {{ sldata_slave }}         trust'
+      state: present
+      
+  - name: start postgresql service
+    service:
+      name: postgresql
+      state: restarted
+      
+  - name: Create Replication PostgreSQL user
+    become: yes
+    become_user: postgres
+    postgresql_user:
+      name: replication
+      password: "{{ replication_pass }}"
+      role_attr_flags: REPLICATION
+      expires: infinity

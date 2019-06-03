@@ -1,0 +1,44 @@
+---
+
+- name: "Create {{ sldata_couchdb_data_path }}"
+  file:
+    path: "{{ sldata_couchdb_data_path }}"
+    state: directory
+    owner: "{{ sldata_couchdb_user }}"
+    group: "{{ sldata_couchdb_group }}"
+    
+- name: Enable autostart when reboot of couchdb
+  copy:
+    src: "{{sldata_couchdb_start_script}}"
+    dest: "{{ sldata_couchdb_init_d }}"
+    remote_src: yes
+    mode: 0755
+
+- name: Update couchdb service
+  become_user: root
+  shell: update-rc.d couchdb defaults 
+    
+- name: Apply local.ini template
+  become_user: couchdb
+  notify: restart couchdb
+  template:
+    src: local.ini.j2
+    dest: "{{ sldata_couchdb_app_folder }}/local.ini"
+    mode: 0644
+  
+- name: Config couchdb logrotate template
+  become_user: root
+  template:
+    src: couchdb.j2
+    dest: "{{ sldata_logrotate_folder }}/couchdb"
+
+#
+# Cluster configuration:
+# for each couchdb in the cluster
+#   i set up a replication
+#
+# at the end I should have a bidirectional
+# replication between every element
+# in the cluster
+#
+    

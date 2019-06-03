@@ -1,0 +1,29 @@
+---
+
+- name: Install slbk needed dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop: "{{ slbk_dependencies }}"
+
+- name: Create slbk folders
+  file:
+    path: "{{ item.folder }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group_owner }}"
+  loop:  "{{ slbk_folders_permission }}"
+
+- name: "Share slbk folders with {{ slbk_sldata_master }}"
+  become_user: root
+  notify: reload nfs-kernel-server
+  template:
+    src: exports.j2
+    dest: "/etc/exports"
+    mode: 0644
+
+
+
+
+

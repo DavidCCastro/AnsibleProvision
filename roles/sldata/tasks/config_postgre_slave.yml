@@ -1,0 +1,72 @@
+- hosts: "{{ sldata_slave }}"
+  user: smartlis
+  become: yes
+  become_method: sudo
+  
+  tasks:
+  - name: Create Replication PostgreSQL user
+    become: yes
+    become_user: postgres
+    postgresql_user:
+      name: replication
+      password: "{{ replication_pass }}"
+      role_attr_flags: REPLICATION
+      expires: infinity
+  
+  - name: stop postgresql service
+    service:
+      name: postgresql
+      state: stopped
+      
+  - name: Edit /etc/postgresql/9.6/main/postgresql.conf to enable WAL
+    lineinfile:
+      path: /etc/postgresql/9.6/main/postgresql.conf
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    with_items:
+      - { regexp: "#wal_level = minimal", line: "wal_level = archive" }
+      - { regexp: "#archive_mode = off", line: "archive_mode = on" }
+      - { regexp: "#archive_command = ''", line: "archive_command = 'cp %p /mnt/data/postgresql/9.6/main/archive/%f'" }
+      - { regexp: "#max_wal_senders = 0", line: "max_wal_senders = 5" }
+      - { regexp: "#wal_keep_segments = 0", line: "wal_keep_segments = 32" }
+      - { regexp: "#hot_standby = off", line: "hot_standby = on" }
+      
+  - name: Edit /etc/postgresql/9.6/main/pg_hba.conf to enable replication
+    lineinfile:
+      path: /etc/postgresql/9.6/main/pg_hba.conf
+      regexp: '^# Allow replication connections from localhost, by a user with the'
+      insertafter: '^# Allow replication connections from localhost, by a user with the'
+      line: 'host     replication     replication     {{ sldata_master }}         trust'
+      state: present
+  
+  - name: Rename main data directory
+    shell: mv /mnt/data/postgresql/9.6/main /mnt/data/postgresql/9.6/mainbackup
+  
+  - name: Syncronize data from master to slave
+    become: yes
+    become_user: postgres
+    shell: pg_basebackup -h 192.1.1.230 -D /mnt/data/postgresql/9.6/main -U replication -v -P
+           
+  - name: Create recovery.conf file
+    become_user: postgres
+    become_method: sudo
+    file:
+      path: /mnt/data/postgresql/9.6/main/recovery.conf
+      state: touch
+      owner: postgres
+      group: postgres
+      
+  - name: Configure recovery.conf file
+    blockinfile:
+      path: /mnt/data/postgresql/9.6/main/recovery.conf
+      content: |
+        standby_mode = 'on'
+        primary_conninfo = 'host={{ sldata_master }} port=5432 user=replication password={{ replication_pass }}'
+        restore_command = 'cp /mnt/data/postgresql/9.6/main/archive/%f %p'
+        archive_cleanup_command = 'pg_archivecleanup /mnt/data/postgresql/9.6/main/archive %r'
+   
+  - name: start postgresql service
+    service:
+      name: postgresql
+      state: started
+   

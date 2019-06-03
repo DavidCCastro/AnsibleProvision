@@ -1,0 +1,10 @@
+---
+# handlers file for slapp
+
+- name: reload supervisor
+  command: "supervisorctl update"
+
+- name: restart smartlis-core-backend
+  supervisorctl:
+    name: "{{ smartlis_backend_supervisor_service }}"
+    state: restarted

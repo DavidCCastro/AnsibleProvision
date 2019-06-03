@@ -1,0 +1,45 @@
+---
+
+#
+#
+# Smartlis DB initialization. Now the scripts are not idempotent
+# As a workaround I create a file
+#
+#
+
+- name: "[Slapp] | Check if the dbs are already initialized"
+  stat:
+    path: "{{ smartlis_backend_db_init_flag }}"
+  register: stat_result
+
+#
+# # need fix in python path 
+# - name: "[Slapp] | Check if db exists"
+#   command: "{{ smartlis_backend_venv }}/bin/python {{ smartlis_backend_path }}/check_default_database_existence.py"
+#     args:
+#       chdir: "{{ smartlis_backend_path }}/sl_root"
+#   register: db_existance
+
+# this fact is used after by the scripts
+# to stop execution in case of errors
+- name: "[Slapp] | Setting useful fact"
+  set_fact:
+    prev_script_result:
+      rc: 0
+
+- name: "[Slapp] | Running init script"
+  become_user: "{{ smartlis_user }}"
+  command: "{{ smartlis_backend_venv }}/bin/python {{ smartlis_backend_path }}/{{ item }}"
+  args:
+    chdir: "{{ smartlis_backend_path }}/sl_root"
+  register: prev_script_result
+  loop: "{{ smartlis_backend_db_init_scripts }}"
+  when: (reinitialize_db or not stat_result.stat.exists) and (prev_script_result.rc == 0)
+
+- name: "[Slapp] | setting db initialized file flag"
+  template:
+    src: "{{ smartlis_backend_db_init_file_name }}"
+    dest: "{{ smartlis_backend_db_init_flag }}"
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+  when: not stat_result.stat.exists

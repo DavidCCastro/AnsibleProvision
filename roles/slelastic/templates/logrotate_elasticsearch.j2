@@ -1,0 +1,10 @@
+{{ elastic_logrotate_wildcard }} {
+    daily
+    missingok
+    maxsize {{ elastic_logrotate_maxsize }}
+    rotate {{ elastic_logrotate_number }}
+    copytruncate
+    compress
+    notifempty
+    create 644 elasticsearch elasticsearch
+}

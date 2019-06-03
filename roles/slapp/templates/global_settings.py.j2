@@ -1,0 +1,129 @@
+# -*- coding: utf-8 -*-
+
+POSTGRES_USER = "{{ gsettings_postgres_user }}"
+POSTGRES_PASS = "{{ gsettings_postgres_pass }}"
+POSTGRES_PORT = {{ gsettings_postgres_port }}
+POSTGRES_HOST = '{{ gsettings_postgres_host }}'
+
+COUCHDB_PORT = {{ gsettings_couchdb_port }}
+COUCHDB_HOST = '{{ gsettings_couchdb_host }}'
+COUCHDB_USER = '{{ gsettings_couchdb_user }}'
+COUCHDB_PASS = '{{ gsettings_couchdb_pass }}'
+
+ELASTICSEARCH_PORT = {{ gsettings_elastic_port }}
+ELASTICSEARCH_HOST = '{{ gsettings_elastic_host }}'
+
+BROKER_URL = "{{ gsettings_broker_url }}"
+
+SL_REDIS_SERVER = "{{ gsettings_redis_server }}"
+SL_REDIS_SERVER_SOCKET = "{{ gsettings_redis_server_socket }}"
+SL_REDIS_GLOBAL_SERVER = "{{ gsettings_redis_global_server }}"
+
+TIME_ZONE = '{{ gsettings_time_zone }}'
+LANGUAGE_CODE = '{{ gsetting_language_code }}'
+
+{% if gsettings_spare_vars %}
+{% for var in gsettings_spare_vars %}
+{{ var }}
+{% endfor %}
+{% endif %}
+
+EXCLUDE_SUBSYSTEMS = [
+{% if gsettings_exclude_subsistems %}
+{% for subsistem in gsettings_exclude_subsistems %}
+    "{{ subsistem }}",
+{% endfor %}
+{% endif %}
+]
+
+CORS_ORIGIN_WHITELIST = [
+{% if gsettings_cors_origin_whitelist %}
+{% for url in gsettings_cors_origin_whitelist %}
+    "{{ url }}",
+{% endfor %}
+{% endif %}
+]
+
+DB_PREFIX = "{{ gsettings_db_prefix }}"
+
+## postgres names ##
+{% if gsettings_postgres_databases %}
+{% for item in gsettings_postgres_databases %}
+DB_{{ item.varname }} = DB_PREFIX + "{{ item.name }}"
+{% endfor %}
+{% endif %}
+
+## couchdb names ##
+{% if gsettings_couchdb_databases %}
+{% for item in gsettings_couchdb_databases %}
+COUCHDB_DB{% if item.varname %}_{% endif %}{{ item.varname }} = DB_PREFIX + "{{ item.name }}"
+{% endfor %}
+{% endif %}
+
+## elasticsearch names ##
+{% if gsettings_elasticsearch_indexes %}
+{% for item in gsettings_elasticsearch_indexes %}
+ELASTICSEARCH_INDEX_{{ item.varname }} = DB_PREFIX + "{{ item.name }}"
+{% endfor %}
+{% endif %}
+
+## postgres ##
+
+{% if gsettings_postgres_databases %}
+{% for item in gsettings_postgres_databases %}
+{{ item.varname }}_DATABASE = {
+    'ENGINE':   'django.db.backends.postgresql_psycopg2',
+    'NAME':     DB_{{ item.varname }},
+    'USER':     POSTGRES_USER,
+    'PASSWORD': POSTGRES_PASS,
+    'HOST':     POSTGRES_HOST,
+    'PORT':     str(POSTGRES_PORT),
+}
+
+{% endfor %}
+{% endif %}
+
+## couchdb ##
+
+{% if gsettings_couchdb_databases %}
+{% for item in gsettings_couchdb_databases %}
+DOC{% if item.varname %}_{% endif %}{{ item.varname }}_DATABASE = {
+    'ENGINE': '*** NOT USED ***',
+    'NAME': COUCHDB_DB{% if item.varname %}_{% endif %}{{ item.varname }},
+    'USER': COUCHDB_USER,
+    'PASSWORD': COUCHDB_PASS,
+    'HOST': COUCHDB_HOST,
+    'PORT': COUCHDB_PORT,
+}
+
+{% endfor %}
+{% endif %}
+
+## elasticsearch ##
+
+{% if gsettings_elasticsearch_indexes %}
+{% for item in gsettings_elasticsearch_indexes %}
+{{ item.varname }}_INDEX = {
+    "SERVER": ELASTICSEARCH_HOST,
+    "PORT": ELASTICSEARCH_PORT,
+    "INDEX": ELASTICSEARCH_INDEX_{{ item.varname }}
+}
+
+{% endfor %}
+{% endif %}
+
+CACHES = {
+{% for item in gsettings_caches %}
+    {{ item.name }}: {
+{% for keyvalue in item.keyvalues %}
+        {{ keyvalue }},
+{% endfor %}
+        'OPTIONS': {
+{% for option in item.options %}
+            {{ option }},
+{% endfor %}
+        }
+    },
+
+{% endfor %}
+}

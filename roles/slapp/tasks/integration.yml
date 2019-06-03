@@ -1,0 +1,23 @@
+---
+
+- name: "[Slapp/integration] | create needed dirs"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+  loop: "{{ smartlis_integration_needed_dirs }}"
+
+- name: "[Slapp/integration] | install requirements file"
+  template:
+    src: "{{ smartlis_integration_venv_requirements }}"
+    dest: "{{ smartlis_integration_venv_requirements_path }}"
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+
+- name: "[Slapp/integration] | pip install requirements in venv"
+  become_user: "{{ smartlis_user }}"
+  pip:
+    virtualenv: "{{ smartlis_integration_venv }}"
+    requirements: "{{ smartlis_integration_venv_requirements_path }}"
+    state: present

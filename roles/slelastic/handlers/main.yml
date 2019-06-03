@@ -1,0 +1,12 @@
+---
+# handlers file for slelastic
+
+- name: restart elasticsearch
+  systemd:
+    name: elasticsearch
+    state: restarted
+
+- name: restart cron
+  systemd:
+    name: cron
+    state: restarted

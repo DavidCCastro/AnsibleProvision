@@ -1,0 +1,10 @@
+---
+# tasks file for sldata
+
+- import_tasks: install_postgresql.yml
+- import_tasks: configure_postgresql.yml
+- import_tasks: install_couchdb_dependencies.yml
+- import_tasks: install_couchdb.yml
+- import_tasks: configure_couchdb.yml
+#- import_tasks: test_postgresql.yml
+

@@ -1,0 +1,30 @@
+---
+
+elastic_user: elasticsearch
+elastic_group: elasticsearch
+elastic_limit_memlock: infinity
+elastic_max_locked_memory: unlimited
+# lock to avoid swapping
+elastic_bootstrap_mlockall: "true"
+elastic_cluster_name: smartlis
+elastic_node_name: "{{ ansible_hostname }}"
+elastic_node_master: "true"
+elastic_index_mapping_ignore_malformed: "true"
+elastic_vm_max_map_count: 262144
+elastic_plugins_list:
+  - name: 'mobz/elasticsearch-head'
+    url: 'https://github.com/mobz/elasticsearch-head/archive/master.zip'
+elastic_repo_key: https://packages.elastic.co/GPG-KEY-elasticsearch
+elastic_repo_source: "deb http://packages.elastic.co/elasticsearch/1.7/debian stable main"
+elastic_apt_packages:
+  - elasticsearch=1.7.4
+  - openjdk-8-jre-headless
+elastic_logrotate_wildcard: "/var/log/elasticsearch/*.log"
+elastic_logrotate_minute: "0,30"
+elastic_logrotate_hour: "*"
+elastic_logrotate_job: "/etc/cron.daily/logrotate"
+elastic_logrotate_maxsize: 100M
+elastic_logrotate_number: 10
+
+#elastic_heap_size: "{{ (ansible_memtotal_mb / 2048)|int }}g"
+elastic_heap_size: "{{ (ansible_memtotal_mb / 2)|int }}m"

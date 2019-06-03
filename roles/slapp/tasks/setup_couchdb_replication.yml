@@ -1,0 +1,66 @@
+---
+
+- name: set needed facts hosts
+  set_fact:
+    couchdb_hosts: "{{ ['http://' + couchdb_user + ':' + couchdb_pass + '@'] | product(groups['sldata']) | map('join', '') | product([':5984']) | map('join', '') | list }}"
+    db_to_replicate: "{{ gsettings_couchdb_databases }}"
+    db_prefix: "{{ gsettings_db_prefix }}"
+
+# - name: put _replicator document simple
+#   register: result
+#   uri:
+#     url: "{{ couchdb_host1 }}/_replicator/rep_{{ db_prefix }}{{ item.name }}/"
+#     method: PUT
+#     body:
+#       "source": "{{ db_prefix }}{{ item.name }}"
+#       "target": "{{ couchdb_host2 }}/{{ db_prefix }}{{ item.name }}"
+#       "continuous": true
+#       "create_target": true
+#     body_format: json
+#   changed_when: result.status == 201
+#   failed_when: result.status != 201 and result.status != 409
+#   loop: "{{ db_to_replicate }}"
+
+# - name: debug
+#   debug:
+#     msg:
+#       - hosts: "{{ couchdb_hosts }}"
+#         url: "{{ item[0][0] }}/_replicator/{{ (db_prefix + item[1].name + item[0][1]) | hash('md5') | urlencode }}/"
+#         body:
+#           "source": "{{ db_prefix }}{{ item[1].name }}"
+#           "target": "{{ item[0][1] }}/{{ db_prefix }}{{ item[1].name }}"
+#           "continuous": true
+#           "create_target": true
+#   loop: "{{ couchdb_hosts | product(couchdb_hosts) | list | product(db_to_replicate) | list }}"
+#   # we are avoiding replicating to same server
+#   when: deployment_type != "simple" and item[0][0] != item[0][1]
+
+- name: put _replicator complex
+  register: result
+  uri:
+    # the document id is a md5 hash of db_name and replication_target
+    url: "{{ item[0][0] }}/_replicator/{{ (db_prefix + item[1].name + item[0][1]) | hash('md5') | urlencode }}/"
+    method: PUT
+    body:
+      "source": "{{ db_prefix }}{{ item[1].name }}"
+      "target": "{{ item[0][1] }}/{{ db_prefix }}{{ item[1].name }}"
+      "continuous": true
+      "create_target": true
+    body_format: json
+    force_basic_auth: yes
+  # 201 -> document created
+  changed_when: result.status == 201
+  # 409 -> conflict, so the document was already there
+  failed_when: result.status != 201 and result.status != 409
+  # we are iterating over list of elements like this:
+  # [
+  #     "http://couchdb1:5984", -> item[0][0]
+  #     "http://couchdb2:5985"  -> item[0][1]
+  # ],
+  # {
+  #     "name": "smartlis",     -> item[1].name
+  #     "varname": ""         # not needed by this playbook
+  # }
+  loop: "{{ couchdb_hosts | product(couchdb_hosts) | list | product(db_to_replicate) | list }}"
+  # we are avoiding replicating to same server
+  when: deployment_type != "simple" and item[0][0] != item[0][1]

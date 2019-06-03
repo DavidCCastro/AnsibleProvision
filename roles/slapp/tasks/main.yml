@@ -1,0 +1,15 @@
+---
+# taasks for rabbitmq
+- import_tasks: install.yml
+- import_tasks: integration.yml
+  when: smartlis_integration == true
+- import_tasks: configure.yml
+#
+#
+#   WARNING! Smarlis BE won't start unless dbs are initialized
+#
+#
+- import_tasks: initialize.yml
+  when: smartlis_backend_db_init|bool
+- import_tasks: service.yml
+- import_tasks: setup_couchdb_replication.yml

@@ -1,0 +1,28 @@
+---
+- name: Select all from example table
+  become_user: postgres
+  command: psql -c "show data_directory;" 
+  register: select_all_from_example
+
+- name: Display example table contents
+  set_fact: 
+    current_dir: "{{ select_all_from_example.stdout_lines[2].strip() }}"
+  
+- name: test dir from db
+  debug: 
+    msg: "_{{ current_dir }}_ && _{{ sldata_psql_data_path }}_ "
+
+- name: testing is a cluster already installed
+  debug: msg="Ya existe"
+  when: sldata_psql_data_path  ==  current_dir
+
+
+
+#- name: Remove default instance of postgres
+#  become_user: postgres
+#  shell: "pg_dropcluster --stop {{ sldata_postgres_version }} {{ sldata_postgres_cluster }}"
+
+#- name: Recreate postgres instance in the correct path
+#  become_user: postgres
+#  shell: "pg_createcluster --start {{ sldata_postgres_version }} {{ sldata_postgres_cluster }} -d {{ sldata_psql_data_path }}"
+

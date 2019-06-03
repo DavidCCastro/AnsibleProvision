@@ -1,0 +1,21 @@
+---
+
+- name: "[Elastic] | enable elasticsearch service"
+  systemd:
+    name: elasticsearch
+    enabled: true
+
+- name: "[Elastic] | start elasticsearch service"
+  systemd:
+    name: elasticsearch
+    state: started
+
+- name: "[Elastic] | enable cron service"
+  systemd:
+    name: cron
+    enabled: true
+
+- name: "[Elastic] | start cron service"
+  systemd:
+    name: cron
+    state: started

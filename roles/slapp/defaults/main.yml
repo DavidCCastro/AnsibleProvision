@@ -1,0 +1,252 @@
+reinitialize_db: false
+
+slapp_apt_packages:
+  - python
+  - python-dev
+  - build-essential
+  - supervisor
+  - libpq-dev
+  - libxml2-dev
+  - libxslt1-dev
+  - libffi-dev
+  - libssl-dev
+  - libsasl2-dev
+  - libldap2-dev
+  - unzip
+
+slapp_pip_packages:
+  - virtualenv
+
+smartlis_user: smartlis
+smartlis_group: smartlis
+
+smartlis_backend_uwsgi_cidr: "0.0.0.0:9000"
+smartlis_backend_http_socket: false
+smartlis_backend_http_cidr: "0.0.0.0:9080"
+smartlis_backend_uwsgi_stats_cidr: "0.0.0.0:9100"
+smartlis_backend_uwsgi_stats_http: false
+smartlis_backend_uwsgi_processes: 4
+smartlis_backend_uwsgi_threads: 2
+smartlis_backend_uwsgi_max_requests: 5000
+smartlis_backend_uwsgi_buffer_size: 32768
+
+smartlis_backend_log_path: "/var/log/smartlis/core/backend"
+
+smartlis_backend_etc_path: "/etc/smartlis/core/backend"
+
+smartlis_backend_path: "/srv/smartlis/core/backend"
+
+smartlis_settings_path: "{{ smartlis_backend_path }}/settings/"
+
+slapp_needed_dirs:
+  - "{{ smartlis_backend_path }}"
+  - "{{ smartlis_backend_etc_path }}"
+  - "{{ smartlis_backend_path }}/settings"
+  - "{{ smartlis_backend_log_path }}"
+
+smartlis_backend_version_full: "{{ smartlis_backend_version }}{{ smartlis_backend_patch }}"
+
+smartlis_backend_archive_name: "smartlis_backend_{{ smartlis_backend_version_full }}.zip"
+
+# This could be a file path too
+smartlis_backend_url: "{{ pydio_backend_url }}/{{ smartlis_backend_version }}/{{ smartlis_backend_archive_name }}"
+
+smartlis_backend_venv: "{{ smartlis_backend_path }}/venv"
+smartlis_backend_venv_requirements: "{{ smartlis_backend_path }}/requirements.txt"
+
+smartlis_backend_fonts_src: "fonts.zip"
+smartlis_backend_fonts_path: "{{ smartlis_backend_path }}/venv/lib/python2.7/site-packages/reportlab/fonts"
+smartlis_backend_fonts_remote_src: "false"
+smartlis_backend_fonts_exclude_path: "{{ smartlis_backend_fonts_path }}/times.ttf"
+
+smartlis_backend_archive_src: "{{ smartlis_backend_url }}"
+
+smartlis_backend_remote_src: "true"
+
+# used to check if BE is already installed
+smartlis_backend_exclude_path: "{{ smartlis_backend_path }}/sl_root"
+
+smartlis_backend_patches:
+  - src: "{{ smartlis_backend_path }}/patches/0001-interprets_empty_strings_as_nulls.patch"
+    remote_src: "true"
+    strip: "1"
+    basedir: "{{ smartlis_backend_path }}/venv"
+
+smartlis_backend_outlog_maxbytes: "10MB"
+smartlis_backend_outlog_backups: "10"
+smartlis_backend_outcap_maxbytes: "1MB"
+smartlis_backend_errlog_maxbytes: "10MB"
+smartlis_backend_errlog_backups: "10"
+
+smartlis_backend_db_init: false
+smartlis_backend_db_init_file_name: ".sl_db_init"
+smartlis_backend_db_init_flag: "{{ smartlis_backend_path }}/{{ smartlis_backend_db_init_file_name }}"
+
+smartlis_backend_db_init_scripts:
+  - "sl_root/scripts/initialize/A_create_empty_databases.py SHOW"
+  - "sl_root/scripts/initialize/A_create_empty_databases.py NO_FAIL"
+  - "sl_root/scripts/initialize/B_create_empty_tables.py"
+  - "sl_root/scripts/initialize/C_init_system_tables.py"
+  - "sl_root/scripts/initialize/D_load_base.py"
+  - "update_translations.py"
+  # - "sl_root/scripts/initialize/E_load_demo.py"
+  # - "sl_root/scripts/initialize/F_load_10_orders.py"
+  # - "sl_root/scripts/initialize/I_test_admin_pages.py"
+  # - "sl_root/scripts/initialize/J_sl_boot.py"
+  # - "sl_root/scripts/initialize/K_simple_workflow.py"
+
+smartlis_integration: false
+smartlis_integration_path: "/srv/smartlis/extensions/devices"
+smartlis_integration_needed_dirs:
+  - "{{ smartlis_integration_path }}"
+  - "/var/lib/smartlis/"
+  - "/var/lib/smartlis/extensions/devices/shared"
+
+smartlis_integration_venv: "{{ smartlis_integration_path }}/venv"
+smartlis_integration_venv_requirements: "integration_requirements.txt"
+smartlis_integration_venv_requirements_path: "{{ smartlis_integration_path }}/requirements.txt"
+
+smartlis_backend_supervisor_service: "smartlis-core-backend"
+
+gsettings_exclude_subsistems:
+  - "dj_patients_ANALIZA"
+  - "dj_patients_BIO"
+  - "dj_patients_CL"
+  - "dj_patients_HM"
+  - "dj_patients_MAGO"
+  - "dj_patients_SBIM"
+  - "dj_amslink"
+  - "dj_conductor"
+  - "dj_monitor"
+  - "dj_omnicalc"
+  - "dj_smartlis.bi"
+  - "dj_smartlis.wikilab"
+  - "dj_smartlis.wksanal"
+  - "dj_patients_NG"
+
+gsettings_db_prefix: "a_"
+
+gsettings_postgres_user: "{{ postgres_user }}"
+gsettings_postgres_pass: "{{ postgres_pass }}"
+gsettings_postgres_port: 5432
+gsettings_postgres_host: "{{ postgres_host }}"
+
+gsettings_couchdb_port: 5984
+gsettings_couchdb_host: "{{ slwww_fqdn }}"
+gsettings_couchdb_user: "{{ couchdb_user }}"
+gsettings_couchdb_pass: "{{ couchdb_pass }}"
+
+gsettings_elastic_port: 9200
+gsettings_elastic_host: "{{ slwww_fqdn }}"
+
+gsettings_broker_host: "{{ broker_host }}"
+gsettings_broker_port: 5672
+gsettings_broker_user: "{{ broker_user }}"
+gsettings_broker_password: "{{ broker_pass }}"
+
+gsettings_broker_url: "amqp://{{ gsettings_broker_user }}:{{ gsettings_broker_password }}@{{ gsettings_broker_host }}:{{ gsettings_broker_port }}"
+
+gsettings_redis_server: "redis://localhost/0"
+gsettings_redis_server_socket: "unix:///tmp/redis.sock/0"
+gsettings_redis_global_server: "redis://{{ ansible_hostname }}:6380/0"
+
+gsettings_time_zone: "Europe/Madrid"
+gsetting_language_code: "en-us"
+
+gsettings_cors_origin_whitelist:
+#  - "slwww:8084"  #Example 1
+#  - "labtech3.smartlis.com:55253"   #Example 2
+
+gsettings_spare_vars:
+  - "DEBUG = True"
+  - "IGNORE_SL_PING = True"
+  - "BOOT_SHOW_LOADING_HIERARCHY = False"
+  - 'CELERY_RESULT_BACKEND = "amqp"'
+  - 'CELERY_DISABLE_RATE_LIMITS = True'
+  - 'CELERY_TASK_RESULT_EXPIRES = 360'
+
+gsettings_postgres_databases:
+  - varname: DEFAULT
+    name: sl
+  - varname: DATA
+    name: sl_data
+  - varname: LOG
+    name: sl_log
+  - varname: PATIENTS
+    name: sl_patients
+  - varname: DATA
+    name: sl_data
+  - varname: WKSANAL
+    name: sl_wksanal
+  - varname: BI
+    name: sl_bi
+  - varname: COMM
+    name: sl_comm
+  - varname: GEN
+    name: sl_gen
+  - varname: DATA
+    name: sl_data
+  - varname: BILLING
+    name: sl_billing
+  - varname: LOGISTIC
+    name: sl_logistic
+
+gsettings_couchdb_databases:
+  - varname: ""
+    name: "smartlis"
+  - varname: "PATIENTS"
+    name: "smartlis_patients" 
+
+gsettings_elasticsearch_indexes:
+  - varname: "DOC"
+    name: "sl_orders"
+  - varname: "WORKLIST"
+    name: "sl_worklist"
+  - varname: "QUALITY"
+    name: "sl_quality"
+  - varname: "PREANALITIC"
+    name: "sl_preanalitic"
+  - varname: "VALTECH"
+    name: "sl_valtech"
+  - varname: "WORKAREA"
+    name: "sl_workarea"
+  - varname: "LOG_SAVE_ORDER"
+    name: "sl_log_save_order"
+  - varname: "TESTS"
+    name: "sl_tests"
+  - varname: "SMARTLIS"
+    name: "smartlis"
+
+gsettings_caches:
+  - name: "'default'"
+    keyvalues:
+      - "'BACKEND': 'django_redis.cache.RedisCache'"
+      - "'LOCATION': SL_REDIS_SERVER"
+      - "'TIMEOUT': 3400 * 24"
+    options:
+      - "'MAX_ENTRIES': 1000000"
+      - "'CLIENT_CLASS': 'django_redis.client.DefaultClient'"
+  - name: "'cache1'"
+    keyvalues:
+      - "'BACKEND': 'django_redis.cache.RedisCache'"
+      - "'LOCATION': SL_REDIS_SERVER"
+      - "'TIMEOUT': 3400 * 24"
+    options:
+      - "'MAX_ENTRIES': 1000000"
+      - "'CLIENT_CLASS': 'django_redis.client.DefaultClient'"
+  - name: "'cache2'"
+    keyvalues:
+      - "'BACKEND': 'django_redis.cache.RedisCache'"
+      - "'LOCATION': SL_REDIS_SERVER"
+      - "'TIMEOUT': 3400 * 24"
+    options:
+      - "'MAX_ENTRIES': 1000000"
+      - "'CLIENT_CLASS': 'django_redis.client.DefaultClient'"
+  - name: "'cache3'"
+    keyvalues:
+      - "'BACKEND': 'django_redis.cache.RedisCache'"
+      - "'LOCATION': SL_REDIS_SERVER"
+      - "'TIMEOUT': 3400 * 24"
+    options:
+      - "'MAX_ENTRIES': 1000000"
+      - "'CLIENT_CLASS': 'django_redis.client.DefaultClient'"

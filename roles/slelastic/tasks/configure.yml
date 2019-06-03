@@ -1,0 +1,45 @@
+---
+
+- name: Configure OS virtual memory
+  sysctl:
+    name: vm.max_map_count
+    value: "{{ elastic_vm_max_map_count }}"
+    state: present
+
+- name: "[Elastic] | apply elasticsearch.yml template"
+  template:
+    src: elasticsearch.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+  notify: restart elasticsearch
+
+- name: "[Elastic] | apply etc/default/elasticsearch template"
+  template:
+    src: elasticsearch.j2
+    dest: /etc/default/elasticsearch
+  notify: restart elasticsearch
+
+- name: "[Elastic] | apply elasticsearch.yml template"
+  template:
+    src: elasticsearch.service.j2
+    dest: /usr/lib/systemd/system/elasticsearch.service
+  notify: restart elasticsearch
+
+- name: "[Elastic] | apply logging.yml template"
+  template:
+    src: logging.yml.j2
+    dest: /etc/elasticsearch/logging.yml
+  notify: restart elasticsearch
+
+- name: "[Elastic] | apply logrotate elasticsearch template"
+  template:
+    src: logrotate_elasticsearch.j2
+    dest: /etc/logrotate.d/elasticsearch
+
+- name: "Add a more frequent cron job for logrotate"
+  cron:
+    name: "frequent_logrotate"
+    minute: "{{ elastic_logrotate_minute }}"
+    hour: "{{ elastic_logrotate_hour }}"
+    job: "{{ elastic_logrotate_job }}"
+    state: present
+  notify: restart cron

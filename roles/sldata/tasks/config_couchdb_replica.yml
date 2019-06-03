@@ -1,0 +1,14 @@
+- hosts: "{{ sldata_master }}"
+  user: smartlis
+  become: yes
+  become_method: sudo
+  
+  tasks:
+  - name: Create master-slave replication for smartlis database
+    uri:
+      url: http://localhost:5984/_replicate
+      method: POST
+      body: '{"source": "http://192.1.1.230:5984/smartlis", "target": "http://192.1.1.231:5984/smartlis", "create_target": true, "continuous": true}'
+      body_format: json
+      status_code: 202
+      return_content: yes

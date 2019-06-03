@@ -1,0 +1,18 @@
+- hosts: "{{ servers }}"
+  user: smartlis
+    
+  tasks:
+  - name: Check sys calls count
+    command: psql -d sl_log -c "select case when cantidad<100 then 'OK' when cantidad<250 then 'Warning' else 'Danger' end AS Resultado from ( select count(*) Cantidad from public.sys_call_log where ms > 5000 and username not in ('online','AnonymousUser','suser','hcis') and date_part('day',dtcrea)=date_part('day',CURRENT_TIMESTAMP) and date_part('hour', dtcrea)=date_part('hour', CURRENT_TIMESTAMP)-1 ) AS Call_Log"
+    ignore_errors: yes
+    register: response_time
+  
+  - name: Send message when user syscalls count is greater than 250 in the last hour
+    delegate_to: localhost
+    slack:
+      token: T9N25BYMC/BAX8DKSA3/Z8MVCo8SjbZnAMZJiPxKy4H5
+      msg: "{{ item }} Número llamadas sistema superior a 5 segundos"
+    when: response_time.stdout.find("{{ item }}") != -1
+    with_items:
+      - "Warning"
+      - "Danger"

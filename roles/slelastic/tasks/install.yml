@@ -1,0 +1,49 @@
+---
+
+- name: "[Elastic] | add elastic repo key"
+  apt_key:
+    url: "{{ elastic_repo_key }}"
+    state: present
+
+- name: add elastic repo
+  apt_repository:
+    repo: "{{ elastic_repo_source }}"
+    state: present
+
+- name: "[Elastic] | Install elasticsearch and dependecies"
+  apt:
+    name: "{{ elastic_apt_packages }}"
+    state: present
+    update_cache: yes
+
+#- name: create head directory for plugin
+#  file:
+#    path: /usr/share/elasticsearch/plugins/head
+#    state: directory
+
+#- name: install head plugin
+#  unarchive:
+#    creates: /usr/share/elasticsearch/plugins/elasticsearch-head-master
+#    src: https://github.com/mobz/elasticsearch-head/archive/master.zip
+#    dest: /usr/share/elasticsearch/plugins/head
+#    remote_src: true
+
+- name: "[Elastic] | install needed plugins"
+  elasticsearch_plugin:
+#    url: https://github.com/mobz/elasticsearch-head/archive/master.zip
+    url: "{{ item.url }}"
+#    name: mobz/elasticsearch-head
+    name: "{{ item.name }}"          
+    state: present
+  loop: "{{ elastic_plugins_list }}"
+#    force: yes
+#    plugin_bin: /usr/share/elasticsearch/bin/plugin
+#   url: 
+
+- name: "[Elastic] | Create {{ elastic_data_path }} folder"
+  file:
+    path: "{{ elastic_data_path }}"
+    state: directory
+    owner: "{{ elastic_user }}"
+    group: "{{ elastic_group }}"
+  when: elastic_data_path is defined

@@ -1,0 +1,5 @@
+---
+# tasks file for slPG_backup
+
+- import_tasks: install_slbk.yml
+

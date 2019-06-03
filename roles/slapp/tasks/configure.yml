@@ -1,0 +1,51 @@
+---
+
+- name: "[Slapp] | install global settings from template"
+  template:
+    src: "global_settings.py.j2"
+    dest: "{{ smartlis_settings_path }}/global_settings.py"
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+
+
+- name: "[Slapp] | Create global settings symlink in etc"
+  file:
+    src: "{{ smartlis_settings_path }}/global_settings.py"
+    dest: "{{ smartlis_backend_etc_path }}/global_settings.py"
+    state: link
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+
+# supervisor should be started before supervisorctl update
+- name: "[Slapp] | Enable supervisord"
+  systemd:
+    name: "supervisor"
+    state: started
+
+- name: "[Slapp] | supervisor conf from template"
+  template:
+    src: "smartlis-core-backend.conf.j2"
+    dest: "/etc/supervisor/conf.d/smartlis-core-backend.conf"
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+  notify: reload supervisor
+
+- name: flush hanlers
+  meta: flush_handlers
+
+- name: "[Slapp] | Create supervisor conf link in etc"
+  file:
+    src: "/etc/supervisor/conf.d/smartlis-core-backend.conf"
+    dest: "{{ smartlis_backend_etc_path }}/supervisor.conf"
+    state: link
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+
+- name: "[Slapp] | Install uwsgi.ini from template"
+  template:
+    src: "uwsgi.ini.j2"
+    dest: "{{ smartlis_backend_etc_path }}/uwsgi.ini"
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+  notify: restart smartlis-core-backend
+

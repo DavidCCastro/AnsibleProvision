@@ -1,0 +1,38 @@
+---
+
+- name: Add Erlang repo
+  become_user: root
+  template:
+    src: erlang-solutions.list.j2
+    dest: /etc/apt/sources.list.d/erlang-solutions.list
+    mode: 0644
+
+- name: Add Erlang repo key
+  apt_key:
+    url: "{{ sldata_erlang_repo_key }}"
+    state: present
+    
+# - name: Install Erlang packages
+#   apt:
+#     name: "{{item}}={{sldata_erlang_version}}"
+#     #autoremove: yes
+#     state: present
+#     update_cache: yes
+#   loop: "{{ sldata_erlang_pkgs }}"
+    
+- name: Install Erlang packages
+  apt:
+    #
+    # This operation creates a list similar to:
+    # package_name=sldata_erlang_version
+    # then concatenates it to sldata_couch_dependencies
+    #
+    name: "{{ sldata_erlang_pkgs | product([sldata_erlang_version]) | map('join','=') | list + sldata_couch_dependencies }}"
+    state: present
+    update_cache: yes
+
+- name: Mark hold the installed Erlang packages
+  dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop: "{{ sldata_erlang_pkgs }}"

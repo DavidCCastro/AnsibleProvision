@@ -1,0 +1,40 @@
+---
+
+- name: configure CouchDB environment (create user couchdb)
+  user:
+    name: couchdb
+    createhome: yes
+    home: /var/lib/couchdb
+
+- name: configure CouchDB environment (create directories and set permissions)
+  file:
+    path: "{{ item }}"
+    owner: "{{sldata_couchdb_user}}"
+    group: "{{sldata_couchdb_group}}"
+    mode: "g+rw"
+    state: directory
+  loop: "{{ sldata_couchdb_paths }}"
+
+- name: download and untar apache-couchdb-1.6.1.tar.gz into home folder
+  unarchive:
+    src: "{{ sldata_couchdb_url_src }}"
+    dest: "{{ sldata_couchdb_download_folder }}" 
+    remote_src: yes
+
+- name: Configure couchdb installation
+  become_method: sudo
+  shell: "cd {{sldata_couchdb_download_folder}}apache-couchdb-1.6.1/ && ./configure {{sldata_couchdb_configure_installer}}"
+
+- name: install couchdb
+  become_method: sudo
+  shell: "cd {{sldata_couchdb_download_folder}}apache-couchdb-1.6.1/ && make && make install && cd .. && rm -r apache-couchdb-1.6.1/"
+
+- name: "Set correct owner {{ sldata_couchdb_app_folder }}"
+  become_user: root
+  file:
+    path: "{{ sldata_couchdb_app_folder }}"
+    state: directory
+    owner: "{{ sldata_couchdb_user }}"
+    group: "{{ sldata_couchdb_group }}"
+    recurse: yes
+
