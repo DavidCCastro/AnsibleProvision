@@ -1,0 +1,26 @@
+---
+# handlers file for slwww
+- name: restart apache2
+  become_user: root
+  service:
+    name: apache2
+    state: restarted
+
+- name: reload apache2
+  become_user: root
+  service:
+    name: apache2
+    state: reloaded
+
+- name: reload keepalived
+  systemd:
+    name: keepalived
+    state: reloaded
+
+- name: "restart sl_tomcat"
+  docker_container:
+    name: "{{ slwww_docker_tomcat_name }}"
+    detach: true
+    state: started
+    restart: true 
+

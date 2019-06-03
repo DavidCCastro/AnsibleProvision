@@ -1,0 +1,11 @@
+---
+# handlers file for slkibana
+
+- name: systemd daemon reload
+  systemd:
+    daemon_reload: true
+
+- name: kibana restart
+  systemd:
+    name: kibana
+    state: restarted

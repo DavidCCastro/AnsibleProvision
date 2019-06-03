@@ -1,0 +1,20 @@
+Listen 9200
+
+<VirtualHost *:9200>
+
+	ErrorLog /var/log/apache2/elasticsearch-error.log
+	CustomLog /var/log/apache2/elasticsearch-access.log combined
+
+		ServerName {{ slwww_fqdn }}
+
+		<Proxy balancer://elasticsearch>
+			{% for host in groups['slelastic'] %}		 
+			BalancerMember http://{{ host }}:9200
+			{% endfor %}					
+			Require all granted
+		</Proxy>
+
+	ProxyPass / balancer://elasticsearch/
+	ProxyPassReverse / balancer://elasticsearch/
+
+</VirtualHost>

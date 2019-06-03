@@ -1,0 +1,11 @@
+window.addEventListener("message", eventHandler, false);
+
+function eventHandler(event)
+{
+	// Gabriel (06/03/2014)
+	// TODO: Debería chequearse que el origen sea válido.
+	//if (event.origin != "http://secure.com")
+	//	return;
+	window.handleCustomEvents(JSON.stringify(event.data));
+	return 1;
+}

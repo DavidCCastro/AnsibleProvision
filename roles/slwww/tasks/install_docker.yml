@@ -1,0 +1,17 @@
+---
+
+
+- name: "[SLWWW] | Ensure group docker exists"
+  group:
+    name: docker
+    state: present
+
+- name: "[SLWWW] | Adding smartlis user to group docker"
+  user:
+    name: smartlis
+    groups: docker
+    append: yes
+
+#- name: "[SLWWW] | Kill own ssh connections"
+#  meta: reset_connection
+

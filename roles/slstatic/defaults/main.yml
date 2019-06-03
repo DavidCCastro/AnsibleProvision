@@ -1,0 +1,38 @@
+---
+
+static_pip_packages:
+  - virtualenv
+
+static_apt_packages:
+  - python
+  - python-dev
+  - imagemagick
+  - nfs-kernel-server
+  - nfs-common
+
+smartlis_srv_path: "/srv/smartlis"
+smartlis_dbdoc_path: "{{ smartlis_srv_path }}/extensions/dbdoc"
+
+smartlis_log_path: "/var/log/smartlis"
+smartlis_dbdoc_log_path: "{{ smartlis_log_path }}/extensions/dbdoc"
+
+data_path: "/mnt/data"
+smartlis_dbdoc_data_path: "{{ data_path }}/dbdoc"
+
+static_needed_dirs:
+  - "{{ smartlis_dbdoc_path }}"
+  - "{{ smartlis_dbdoc_log_path }}"
+  - "{{ smartlis_dbdoc_data_path }}"
+  - "{{ smartlis_dbdoc_path }}/proc_images"
+  - "{{ smartlis_dbdoc_path }}/sl_dbdoc"
+  - "{{ smartlis_dbdoc_path }}/volantes"
+  - "{{ smartlis_dbdoc_data_path }}/bin"
+  - "{{ smartlis_dbdoc_data_path }}/data"
+  - "{{ smartlis_dbdoc_data_path }}/dbdoc"
+  - "{{ smartlis_dbdoc_data_path }}/proc_escaner"
+  - "{{ smartlis_dbdoc_data_path }}/received"
+  - "{{ smartlis_dbdoc_data_path }}/test_images"
+  - "{{ smartlis_dbdoc_data_path }}/tmp"
+  - "{{ smartlis_dbdoc_data_path }}/tmp_volantes"
+  - "{{ smartlis_dbdoc_data_path }}/test_images/error_exc"
+  - "{{ smartlis_dbdoc_data_path }}/test_images/error_format"

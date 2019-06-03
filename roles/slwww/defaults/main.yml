@@ -1,0 +1,166 @@
+---
+# vars file for slwww
+
+slwww_etc_path: "/etc/smartlis/core/frontend"
+slwww_srv_path: "/srv/smartlis/core/frontend"
+
+slwww_sl_ui_ng_path: "{{ slwww_srv_path }}/sl_ui_ng"
+slwww_sl_workareas_path: "{{ slwww_srv_path }}/workareas"
+slwww_sl_bacteriology2016_path: "{{ slwww_srv_path }}/bacteriology2016"
+
+slwww_sl_ui_ng_path_etc: "{{ slwww_etc_path }}/sl_ui_ng"
+slwww_sl_workareas_path_etc: "{{ slwww_etc_path }}/workareas"
+slwww_sl_bacteriology2016_path_etc: "{{ slwww_etc_path }}/bacteriology2016"
+
+slwww_needed_dirs:
+  - "{{ slwww_sl_ui_ng_path }}"
+  - "{{ slwww_sl_workareas_path }}"
+  - "{{ slwww_sl_bacteriology2016_path }}"
+  - "{{ slwww_sl_ui_ng_path_etc }}"
+  - "{{ slwww_sl_workareas_path_etc }}"
+  - "{{ slwww_sl_bacteriology2016_path_etc }}"
+
+slwww_enabled_sites:
+  - "couchdb"
+  - "elasticsearch"
+  - "kibana"
+  - "smartlis"
+
+slwww_enabled_conf:
+  - "fqdn"
+
+slwww_sl_ui_ng_version_full: "{{ slwww_sl_ui_ng_version }}{{ slwww_sl_ui_ng_patch }}"
+slwww_sl_ui_ng_archive_name: "smartlis_ui_ng-{{ slwww_sl_ui_ng_version_full }}.tar.gz"
+slwww_sl_ui_ng_exclude_path: "{{ slwww_sl_ui_ng_path }}/index.html"
+slwww_sl_ui_ng_archive_url: "{{ pydio_ui_ng_url }}/{{ slwww_sl_ui_ng_version }}/{{ slwww_sl_ui_ng_archive_name }}"
+slwww_sl_ui_ng_archive_src: "{{ slwww_sl_ui_ng_archive_url }}"
+slwww_sl_ui_ng_remote_src: "true"
+
+slwww_workareas_version_full: "{{ slwww_workareas_version }}{{ slwww_workareas_patch }}"
+slwww_workareas_archive_name: "workareas-{{ slwww_workareas_version_full }}.tar.gz"
+slwww_workareas_exclude_path: "{{ slwww_sl_workareas_path }}/index.html"
+slwww_workareas_archive_url: "{{ pydio_workareas_url }}/{{ slwww_workareas_version }}/{{ slwww_workareas_archive_name }}"
+slwww_workareas_archive_src: "{{ slwww_workareas_archive_url }}"
+slwww_workareas_remote_src: "true"
+slwww_workareas_config_js_path: "{{ slwww_sl_workareas_path }}/js/sl_config.js"
+slwww_workareas_config_js_path_etc: "{{ slwww_sl_workareas_path_etc }}/sl_config.js"
+slwww_workareas_dj_server: "/"
+
+slwww_bacteriology2016_version_full: "{{ slwww_bacteriology2016_version }}{{ slwww_bacteriology2016_patch }}"
+slwww_bacteriology2016_archive_name: "bacteriology2016-{{ slwww_bacteriology2016_version_full }}.tar.gz"
+slwww_bacteriology2016_exclude_path: "{{ slwww_sl_bacteriology2016_path }}/javascripts/app.js"
+slwww_bacteriology2016_archive_url: "{{ pydio_micro_url }}/{{ slwww_bacteriology2016_version }}/{{ slwww_bacteriology2016_archive_name }}"
+slwww_bacteriology2016_archive_src: "{{ slwww_bacteriology2016_archive_url }}"
+slwww_bacteriology2016_remote_src: "true"
+
+#
+# Network interface enp0s3 -> ansible_<inteface>.ipv4.address
+#
+slwww_local_ip: "{{ ansible_default_ipv4.address }}"
+slwww_subnet_cidr: "{{ ansible_default_ipv4.address }}/{{ (ansible_default_ipv4.address + '/' + ansible_default_ipv4.netmask) | ipaddr('prefix') }}"
+slwww_distro_release: xenial
+slwww_apt_packages:
+  - apache2
+  - apache2-dev
+  - unzip
+  - libapache2-mod-proxy-uwsgi
+  - python-pip
+  - docker-ce
+  - keepalived
+
+slwww_pip_packages:
+  - docker-py
+
+slwww_3_parts_url: "https://raw.githubusercontent.com/unbit/uwsgi/2.0.15/apache2/mod_proxy_uwsgi.c"
+slwww_apache_mods_dir: "/etc/apache2/mods-available/"
+slwww_apache2_mods: 
+  - info
+  - lbmethod_byrequests
+  - proxy
+  - proxy_balancer
+  - proxy_connect
+  - proxy_express
+  - proxy_fcgi
+  - proxy_fdpass
+#  - proxy_hcheck
+  - proxy_html
+  - proxy_http
+#  - proxy_http2
+  - proxy_scgi
+  - slotmem_plain
+  - ssl
+  - proxy_uwsgi
+  - proxy_wstunnel
+  - xml2enc
+
+slwww_module_path: "/etc/apache2/mods-available"
+slwww_sites_path: "/etc/apache2/sites-available"
+slwww_conf_path: "/etc/apache2/conf-available"
+
+
+# DOCKER INSTALLATION VARS
+
+slwww_default_docker_2_remove:
+  - docker 
+  - docker-engine 
+  - docker.io
+
+slwww_docker_dependencies:
+ - apt-transport-https
+ - ca-certificates
+ - curl
+ - software-properties-common
+
+
+slwww_docker_repo_key: https://download.docker.com/linux/ubuntu/gpg
+slwww_docker_repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu   {{ slwww_distro_release }}    stable"
+slwww_docker_registry: https://docker-registry.smartlis.com
+
+#TOMCAT-CONTAINER VARS
+
+slwww_docker_user: sguest
+slwww_docker_psswd: smartlis
+slwww_docker_tomcat_image: docker-registry.smartlis.com/sl_tomcat:1.46
+slwww_docker_tomcat_name: sl_tomcat
+slwww_docker_tomcat_publ_ports:
+  - "127.0.0.1:8080:8080"
+
+slwww_docker_tomcat_volumes:
+  - "{{ slwww_tomcat_docker_hosts_path }}:/etc/hosts:ro"
+
+#TOMCAT CONFIGURATION VARS
+
+slwww_tomcat_config_files: /srv/smartlis/core/frontend/legacy
+slwww_tomcat_dirs :
+  - "{{ slwww_etc_path }}/legacy/"
+  - "{{ slwww_srv_path }}/legacy/"
+slwww_tomcat_docker_hosts_path: "{{ slwww_tomcat_config_files }}/hosts"
+
+#WORKAREAS CONFIGURATION VARS
+slwww_WA_dirs :
+  - "{{ slwww_etc_path }}/workareas/"
+  - "{{ slwww_srv_path }}/workareas/"
+
+#MICROBIOLOGY CONFIGURATION VARS
+slwww_bacteriology2016_dirs :
+  - "{{ slwww_etc_path }}/bacteriology2016/"
+  - "{{ slwww_srv_path }}/workareas2016/"
+
+#FRONTEND CONFIGURATION VARS
+slwww_frontend_dirs:
+  - "{{ slwww_etc_path }}/smartlis_ui_ng/"
+  - "{{ slwww_srv_path }}/smartls_ui_ng/"
+
+slwww_apache2_root: "/etc/apache2"
+slwww_apache2_envvars: "{{ slwww_apache2_root }}/envvars"
+slwww_apache2_sites_available: "{{ slwww_apache2_root }}/sites-available"
+slwww_apache2_sites_enabled: "{{ slwww_apache2_root }}/sites-enabled"
+slwww_apache2_conf_available: "{{ slwww_apache2_root }}/conf-available"
+slwww_apache2_conf_enabled: "{{ slwww_apache2_root }}/conf-enabled"
+
+slwww_keepalived_check_interval: 5
+slwww_keepalived_state: BACKUP
+slwww_keepalived_priority: 100
+slwww_keepalived_vr_id: 38
+slwww_keepalived_check_script: bash -c "source {{ slwww_apache2_envvars }}; pkill -0 -F $APACHE_PID_FILE"
+slwww_keepalived_conf_path: "/etc/keepalived/keepalived.conf"

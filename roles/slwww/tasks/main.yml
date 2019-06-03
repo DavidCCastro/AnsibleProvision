@@ -1,0 +1,10 @@
+---
+# tasks file for slwww
+
+- import_tasks: prepare_slwww.yml
+- import_tasks: install_docker.yml
+- import_tasks: configure_tomcat.yml
+- import_tasks: configure_apache.yml
+- import_tasks: configure_keepalived.yml
+- import_tasks: service.yml
+- import_tasks: configure_container_tomcat.yml

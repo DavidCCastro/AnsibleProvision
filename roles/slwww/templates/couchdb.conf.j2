@@ -1,0 +1,16 @@
+Listen 5984
+<VirtualHost *:5984>
+	 ErrorLog /var/log/apache2/couchdb-error.log
+	 CustomLog /var/log/apache2/couchdb-access.log combined
+
+	 ServerName {{ slwww_fqdn }}
+	 <Proxy balancer://couchdb>
+	 	{% for host in groups['sldata'] %}		 
+		BalancerMember http://{{ host }}:5984
+        {% endfor %}	
+		Require all granted
+	 </Proxy>
+
+	 ProxyPass / balancer://couchdb/
+	 ProxyPassReverse / balancer://couchdb/
+</VirtualHost>

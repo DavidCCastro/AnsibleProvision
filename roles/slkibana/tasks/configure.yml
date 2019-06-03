@@ -1,0 +1,40 @@
+---
+
+- name: "[Kibana] | Template kibana init"
+  template:
+    src: kibana4_init.j2
+    dest: /etc/init.d/kibana
+    mode: '755'
+  notify:
+    - systemd daemon reload
+    - kibana restart
+
+- name: "[Kibana] | Copy systemd service"
+  copy:
+    src: kibana.service
+    dest: /etc/systemd/system/kibana.service
+    mode: '755'
+  notify: systemd daemon reload
+   
+- name: "[Kibana] | template kibana.yml"
+  template:
+    src: kibana.yml.j2
+    dest: "{{ kibana_install_path }}/{{ kibana_version }}/config/kibana.yml"
+  notify: kibana restart
+
+- name: "[Kibana] | Check if kibana index exists"
+  uri:
+    url: "http://localhost:9200/{{ kibana_index_name }}/"
+    method: HEAD
+    status_code:
+      - 200
+      - 404
+  register: index_status
+
+- name: "[Kibana] | Create kibana index in elasticsearch"
+  uri:
+    url: "http://localhost:9200/{{ kibana_index_name }}/"
+    method: PUT
+    body: "index.mapper.dynamic: {{ kibana_index_mapper_dynamic }}"
+    status_code: 200
+  when: index_status.status == 404

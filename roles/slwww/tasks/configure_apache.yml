@@ -1,0 +1,80 @@
+---
+
+- name: "Template couchdb vhost"
+  template:
+    src: "couchdb.conf.j2"
+    dest: "{{ slwww_sites_path }}/couchdb.conf"
+
+- name: "Template elasticsearch vhost"
+  template:
+    src: "elasticsearch.conf.j2"
+    dest: "{{ slwww_sites_path }}/elasticsearch.conf"
+
+- name: "Template kibana vhost"
+  template:
+    src: "kibana.conf.j2"
+    dest: "{{ slwww_sites_path }}/kibana.conf"
+
+- name: "Template smartlis vhost"
+  template:
+    src: "smartlis.conf.j2"
+    dest: "{{ slwww_sites_path }}/smartlis.conf"
+
+- name: "Template fqdn.conf"
+  template:
+    src: "fqdn.conf.j2"
+    dest: "{{ slwww_conf_path }}/fqdn.conf"
+
+# - name: "Enable apache httpd sites"
+#   command: "a2ensite {{ item }}"
+#   loop: "{{ slwww_enabled_sites }}"
+#   notify:
+#     - reload apache2
+
+- name: "Enable apache httpd sites"
+  file:
+    state: link
+    src: "{{ slwww_apache2_sites_available }}/{{ item }}.conf"
+    dest: "{{ slwww_apache2_sites_enabled }}/{{ item }}.conf"
+    remote_src: yes
+  loop: "{{ slwww_enabled_sites }}"
+  notify:
+    - reload apache2
+
+- name: "Disable 000-default site"
+  file:
+    state: absent
+    path: "{{ slwww_apache2_sites_enabled }}/000-default.conf"
+  notify:
+    - reload apache2
+
+# - name: "Enable apache fqdn conf"
+#   command: "a2enconf fqdn"
+#   notify:
+#     - reload apache2
+
+- name: "Enable apache fqdn conf"
+  file:
+    state: link
+    src: "{{ slwww_apache2_conf_available }}/{{ item }}.conf"
+    dest: "{{ slwww_apache2_conf_enabled }}/{{ item }}.conf"
+    remote_src: yes
+  loop: "{{ slwww_enabled_conf }}"
+  notify:
+    - reload apache2
+
+- name: "Template proxy_balancer.conf"
+  template:
+    src: "proxy_balancer.conf.j2"
+    dest: "{{ slwww_module_path }}/proxy_balancer.conf"
+  notify:
+   - restart apache2
+
+- name: "Enable needed modules of apache2"
+  become_user: root
+  apache2_module:
+    state: present
+    name: "{{ item }}"
+  loop: "{{ slwww_apache2_mods }}"
+  notify:
+    - restart apache2

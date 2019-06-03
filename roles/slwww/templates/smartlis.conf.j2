@@ -1,0 +1,50 @@
+<VirtualHost *:80>
+	 ErrorLog /var/log/apache2/smartlis-error.log
+	 CustomLog /var/log/apache2/smartlis-access.log combined
+
+	 ServerName {{ slwww_fqdn }}
+	 <Proxy balancer://smartlis-backend>
+	 	 {% for host in groups['slapp'] %}		 
+		 BalancerMember uwsgi://{{ host }}:9000
+         {% endfor %}
+		 Require all granted
+	 </Proxy>
+
+		#Smartlis UI_NG
+		ProxyPass /smartlis-ng !
+		Alias /smartlis-ng      /srv/smartlis/core/frontend/smartlis_ui_ng
+		<Directory /srv/smartlis/core/frontend/smartlis_ui_ng>
+				Options Indexes FollowSymLinks
+				AllowOverride None
+				Require all granted
+		</Directory>
+
+		#WorkAreas
+		ProxyPass /workareas !
+		Alias /workareas      /srv/smartlis/core/frontend/workareas
+		<Directory /srv/smartlis/core/frontend/workareas>
+				Options Indexes FollowSymLinks
+				AllowOverride None
+				Require all granted
+		</Directory>
+
+		#Smartlis Frontend (legacy)
+		<Directory /srv/smartlis/core/frontend/legacy>
+				Options Indexes FollowSymLinks
+				AllowOverride None
+				Require all granted
+		</Directory>
+
+		ProxyPass /smartlis/scripts !
+		Alias /smartlis/scripts/config.js /srv/smartlis/core/frontend/legacy/config.js
+		Alias /smartlis/scripts/message-handler.js /srv/smartlis/core/frontend/legacy/message-handler.js
+		Alias /smartlis/smartlis/D69C828AB1DD7FB5581C1C775CDA82E6.cache.html /srv/smartlis/core/frontend/legacy/sl_gwt.html
+		
+		ProxyPass /smartlis http://127.0.0.1:8080/smartlis
+		ProxyPassReverse /smartlis http://127.0.0.1:8080/smartlis
+
+	  #Smattlis Backend
+	  ProxyPass / balancer://smartlis-backend/
+	  ProxyPassReverse / balancer://smartlis-backend/
+
+</VirtualHost>

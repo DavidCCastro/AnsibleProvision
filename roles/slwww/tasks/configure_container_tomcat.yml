@@ -1,0 +1,26 @@
+---
+
+- name: "[SLWWW] | Log into private docker registry and force re-authorization "
+  become_user: root
+  docker_login:
+    registry: "{{ slwww_docker_registry }}"
+    username: "{{ slwww_docker_user }}"
+    password: "{{ slwww_docker_psswd }}"
+#    reauthorize: yes
+
+- name: "[SLWWW] | Pull Tomcat image"
+  docker_image:
+    name: "{{ slwww_docker_tomcat_image }}"
+    state: present
+#    source: pull
+
+- name: "[SLWWW] | Start Tomcat container"
+  docker_container:
+    name: "{{ slwww_docker_tomcat_name }}"
+    image: "{{ slwww_docker_tomcat_image }}"
+    ports: "{{ slwww_docker_tomcat_publ_ports }}"
+    volumes: "{{ slwww_docker_tomcat_volumes }}"
+    detach: true
+    restart_policy: unless-stopped
+    state: started
+

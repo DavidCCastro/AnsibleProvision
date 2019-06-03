@@ -1,0 +1,7 @@
+---
+# handlers file for slstatic
+
+- name: reload nfs-server
+  systemd:
+    name: nfs-server
+    state: reloaded

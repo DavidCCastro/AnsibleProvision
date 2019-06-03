@@ -1,0 +1,6 @@
+{% if groups['slapp'] is defined %}
+{% for backend in groups['slapp'] %}
+/mnt/data/dbdoc/tmp_volantes {{ backend }}(rw,nohide,insecure,no_subtree_check,async)
+/mnt/data/dbdoc/test_images {{ backend }}(rw,nohide,insecure,no_subtree_check,async)
+{% endfor %}
+{% endif %}

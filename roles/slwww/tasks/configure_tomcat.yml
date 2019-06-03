@@ -1,0 +1,51 @@
+---
+
+- name:  Create needed dirs
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+  loop: "{{ slwww_tomcat_dirs }}"
+
+- name: Apply config.js templates
+  become_user: root 
+  template:
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+    src: config.js.j2
+    dest: "{{ slwww_tomcat_config_files }}/config.js"
+    mode: 0664
+
+- name: Apply message-handler.js templates
+  become_user: root
+  template:
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+    src: message-handler.js.j2
+    dest: "{{ slwww_tomcat_config_files }}/message-handler.js"
+    mode: 0664
+
+- name: Apply hosts file template for docker
+  template:
+    src: "sl_tomcat_hosts.j2"
+    dest: "{{ slwww_tomcat_docker_hosts_path }}"
+  notify: restart sl_tomcat
+
+- name: "Copy sl_gwt.html to {{ slwww_tomcat_config_files }}"
+  become_user: root
+  copy:
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+    src: sl_gwt.html
+    dest: "{{ slwww_tomcat_config_files }}/sl_gwt.html"
+    mode: 0664
+
+- name: "Create symbolic link of config.js in {{ slwww_etc_path }}/legacy" 
+  become_user: smartlis
+  file:
+    src: "{{ slwww_tomcat_config_files }}/config.js"
+    dest: "{{ slwww_etc_path }}/legacy/config.js"
+    state: link
+    remote_src: yes
+

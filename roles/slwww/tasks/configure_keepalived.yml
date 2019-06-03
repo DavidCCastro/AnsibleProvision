@@ -1,0 +1,8 @@
+---
+
+- name: "Template keepalived.conf"
+  template:
+    src: "keepalived.conf.j2"
+    dest: "{{ slwww_keepalived_conf_path }}"
+  notify:
+   - reload keepalived

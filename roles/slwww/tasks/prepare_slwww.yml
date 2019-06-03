@@ -1,0 +1,114 @@
+---
+
+- name: "[SLWWW] | Removing default docker's "
+  apt:
+    name: "{{ slwww_default_docker_2_remove }}" 
+    state: absent
+
+- name: "[SLWWW] | Install dependendencies"
+  apt:
+    name: "{{ slwww_docker_dependencies }}"
+    update_cache: yes
+
+- name: "[SLWWW] | Add docker repo key"
+  apt_key:
+    url: "{{ slwww_docker_repo_key }}"
+    state: present
+  retries: 2
+  delay: 5
+
+- name: "[SLWWW] | Add docker APT repo "
+  apt_repository:
+    repo: "{{ slwww_docker_repo }}"
+    state: present
+
+- name: " Install slwww apt packages "
+  apt:
+    name: "{{ slwww_apt_packages }}"
+    state: present
+    update_cache: yes
+
+- name: Installing pip needed packages
+  pip:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ slwww_pip_packages }}"
+
+# - name: Download proxy_uwsgi Apache2 modules
+#   get_url:
+#     url: "{{ slwww_3_parts_url }}"
+#     dest: "/home/{{slwww_smartlis_user}}/"
+
+# - name: Install Apache2 module
+#   become_method: sudo
+#   shell: "cd  /home/{{slwww_smartlis_user}}  && apxs2 -i -c mod_proxy_uwsgi.c"
+ 
+# - name: " Copy proxy_uwsgi.load to {{ slwww_apache_mods_dir }}"
+#   become_user: root
+#   copy:
+#     src: proxy_uwsgi.load
+#     dest: "{{ slwww_apache_mods_dir }}/proxy_uwsgi.load"
+#     mode: 0644
+
+# - name: "Copy proxy_balancer.conf"
+#   become_user: root
+#   template:
+#     src: proxy_balancer.conf.js.j2
+#     dest: "{{ slwww_apache_mods_dir }}/proxy_balancer.conf"
+#     mode: 0644
+
+# - name: "Disable Apache default site"
+#   become_user: root
+#   command: >
+#     a2dissite 000-default
+#   notify: reload apache2
+
+- name: "[Slwww] | create needed dirs"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+  loop: "{{ slwww_needed_dirs }}"
+
+- name: "Install SL ui ng"
+  become_user: "{{ smartlis_user }}"
+  unarchive:
+    creates: "{{ slwww_sl_ui_ng_exclude_path }}"
+    src: "{{ slwww_sl_ui_ng_archive_src }}"
+    dest: "{{ slwww_sl_ui_ng_path }}"
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+    remote_src: "{{ slwww_sl_ui_ng_remote_src }}"
+
+- name: "Install SL workarea"
+  become_user: "{{ smartlis_user }}"
+  unarchive:
+    creates: "{{ slwww_workareas_exclude_path }}"
+    src: "{{ slwww_workareas_archive_src }}"
+    dest: "{{ slwww_sl_workareas_path }}"
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+    remote_src: "{{ slwww_workareas_remote_src }}"
+
+- name: "Install SL bacteriology"
+  become_user: "{{ smartlis_user }}"
+  unarchive:
+    creates: "{{ slwww_bacteriology2016_exclude_path }}"
+    src: "{{ slwww_bacteriology2016_archive_src }}"
+    dest: "{{ slwww_sl_bacteriology2016_path }}"
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+    remote_src: "{{ slwww_bacteriology2016_remote_src }}"
+
+- name: "Template workareas config.js"
+  template:
+    src: "sl_config.js.j2"
+    dest: "{{ slwww_workareas_config_js_path }}"
+
+- name: "Link config.js to etc"
+  file:
+    state: link
+    src: "{{ slwww_workareas_config_js_path }}"
+    dest: "{{ slwww_workareas_config_js_path_etc }}"
+    remote_src: yes

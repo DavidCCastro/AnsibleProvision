@@ -1,0 +1,21 @@
+vrrp_script chk_apache {
+    script {{ slwww_keepalived_check_script }}
+    interval {{ slwww_keepalived_check_interval }}
+}
+
+vrrp_instance VI_1 {
+    interface {{ ansible_default_ipv4.interface }}
+    state {{ slwww_keepalived_state }}
+    priority {{ slwww_keepalived_priority }}
+    
+    virtual_router_id {{ slwww_keepalived_vr_id }}
+    
+    virtual_ipaddress {
+        {{ slwww_keepalived_cidr }}
+    }
+
+    track_script {
+        chk_apache
+    }
+
+}

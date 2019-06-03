@@ -1,0 +1,23 @@
+---
+- name: "[Static] | install apt packages"
+  apt:
+    name: "{{ static_apt_packages }}"
+    state: present
+    update_cache: true
+
+- name: "[Static] | install pip packages"
+  pip:
+    name: "{{ static_pip_packages }}"
+    state: present   
+
+#- name: debug static_needed-dirs
+#  debug:
+#    msg: "{{ static_needed_dirs }}"
+
+- name: "[Static] | create needed dirs"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ smartlis_user }}"
+    group: "{{ smartlis_group }}"
+  loop: "{{ static_needed_dirs }}"

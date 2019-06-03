@@ -1,0 +1,12 @@
+Listen 5601
+
+<VirtualHost *:5601>
+		ErrorLog /var/log/apache2/kibana-error.log
+		CustomLog /var/log/apache2/kibana-access.log combined
+
+		ServerName {{ slwww_fqdn }}
+{% if groups['slkibana'] is defined %}
+		ProxyPass / http://{{ groups['slkibana'][0] }}:5601/
+		ProxyPassReverse / http://{{ groups['slkibana'][0] }}:5601/
+{% endif %}
+</VirtualHost>

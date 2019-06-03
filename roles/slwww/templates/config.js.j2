@@ -1,0 +1,26 @@
+var django = { // url de acceso a django
+{% if slwww_fqdn is defined %}
+    url: "http://{{ slwww_fqdn }}",
+    use_relative_path: true
+{% endif %}
+};
+var printengine = { // url de acceso al printengine
+    url : "http://168.144.82.16:8080/printengine/"
+};
+var urlhelp = { // url de acceso al help
+    url : "http://www.helpconsole.com/smartLIS/Static/default.htm",
+    wiki : "http://omnilab2.dyndns-remote.com:15000/wikilab/index.php/"
+};
+var application = {
+    ignoreCatalog : "false",
+    // Nombre del skin.
+    // Uno de los siguientes valores: 'red', 'green', 'orange'.
+    // Vacío carga skin por defecto.
+    skinName : "green",
+    showLaps: "true",
+    enableChat: "false",
+    // Por defecto se muestran los comentarios por sección.
+    showSectionComments: "false",
+    // Tiempo que se muestra un mensaje (en milisegundos).
+    messageTimeout: 1000
+};

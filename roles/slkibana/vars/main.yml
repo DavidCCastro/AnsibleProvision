@@ -1,0 +1,16 @@
+---
+# vars file for slkibana
+
+kibana_install_path: /opt/kibana
+kibana_log_path: /var/log/kibana
+kibana_version: 4.1.11
+kibana_user: nobody
+kibana_group: nobody
+kibana_folder: "{{ kibana_install_path }}/{{ kibana_version }}"
+kibana_bin: "{{ kibana_folder }}/bin"
+# This could also be a file
+kibana_archive_url: "https://download.elastic.co/kibana/kibana/kibana-{{ kibana_version }}-linux-x64.tar.gz"
+kibana_archive_remote_src: "true"
+kibana_log_file: "{{ kibana_log_path }}/kibana.log"
+kibana_index_name: ".kibana"
+kibana_index_mapper_dynamic: "true"

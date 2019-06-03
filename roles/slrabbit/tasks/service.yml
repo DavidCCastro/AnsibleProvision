@@ -1,0 +1,6 @@
+---
+- name: Enable rabbitmq service
+  systemd:
+    name: rabbitmq-server
+    enabled: true
+    state: started

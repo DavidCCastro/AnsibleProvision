@@ -1,0 +1,16 @@
+<IfModule mod_proxy_balancer.c>
+
+	# Balancer manager enables dynamic update of balancer members
+	# (needs mod_status). Uncomment to enable.
+	#
+	<IfModule mod_status.c>
+	   <Location /balancer-manager>
+			   SetHandler balancer-manager
+			   {% if slwww_local_ip is defined %}
+			   Require ip {{ slwww_subnet_cidr }}
+			   {% endif %}
+	   </Location>
+	</IfModule>
+
+</IfModule>
+

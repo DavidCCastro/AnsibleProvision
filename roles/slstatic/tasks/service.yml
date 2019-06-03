@@ -1,0 +1,7 @@
+---
+
+- name: "[Static] | enable nfs-server.service"
+  systemd:
+    name: nfs-server
+    state: started
+    enabled: true

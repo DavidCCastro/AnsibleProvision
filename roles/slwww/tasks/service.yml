@@ -1,0 +1,19 @@
+---
+
+- name: "Start enable apache"
+  systemd:
+    name: "apache2"
+    state: started
+    enabled: yes
+
+- name: "Start enable docker"
+  systemd:
+    name: "docker"
+    state: started
+    enabled: yes
+
+- name: "start enable keepalived"
+  systemd:
+    name: keepalived
+    state: started
+    enabled: yes

@@ -1,0 +1,18 @@
+---
+- name: Enable the rabbitmq_management plugin
+  rabbitmq_plugin:
+    names: rabbitmq_management
+    state: enabled
+
+- name: Configure rabbitmq.config file
+  template:
+    src: rabbitmq.config.j2
+    dest: /etc/rabbitmq/rabbitmq.config
+  notify: restart rabbitmq-server
+
+- name: Edit permissions for rabbitmq.config file
+  file:
+    path: /etc/rabbitmq/rabbitmq.config
+    group: rabbitmq
+    owner: rabbitmq
+    mode: 0777

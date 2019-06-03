@@ -1,0 +1,21 @@
+---
+
+- name: "[Kibana] | Create {{ kibana_folder }} folder"
+  file:
+    path: "{{ kibana_folder }}"
+    state: directory
+
+- name: "[Kibana] | Create {{ kibana_log_path }} folder"
+  file:
+    path: "{{ kibana_log_path }}"
+    state: directory
+    owner: "{{ kibana_user }}"
+
+- name: "[Kibana] | Download and extract kibana"
+  unarchive:
+    creates: "{{ kibana_folder }}/bin/kibana"
+    src: "{{ kibana_archive_url }}"
+    dest: "{{ kibana_folder }}"
+    extra_opts:
+      - --strip-components=1
+    remote_src: "{{ kibana_archive_remote_src }}"

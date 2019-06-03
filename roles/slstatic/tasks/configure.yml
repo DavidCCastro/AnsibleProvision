@@ -1,0 +1,7 @@
+---
+
+- name: "[Static] | template /etc/exports for nfs"
+  template:
+    src: exports.j2
+    dest: /etc/exports
+  notify: reload nfs-server

@@ -1,0 +1,5 @@
+---
+# taasks for rabbitmq
+- import_tasks: install_rabbitmq.yml
+- import_tasks: configure_rabbitmq.yml
+- import_tasks: service.yml
