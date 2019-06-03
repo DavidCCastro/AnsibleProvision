@@ -1,0 +1,9 @@
+---
+
+- name: debug vars
+  gather_facts: false
+  hosts: slelastic01
+  tasks:
+    - name: debug
+      debug:
+        msg: "elastic_user: {{ elastic_user }}"

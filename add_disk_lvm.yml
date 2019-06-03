@@ -1,0 +1,105 @@
+---
+- hosts: sldata
+  gather_facts: yes
+  become: yes
+ 
+  tasks:
+  - name: create partition for /dev/sdb
+    lvg:
+      vg: vg_data
+      pvs: /dev/sdb
+      state: present
+
+  - name: create postgresql lvol
+    lvol:
+      vg: vg_data
+      lv: lv_postgresql
+      size: 50%VG
+    
+  - name: create couchdb lvol
+    lvol:
+      vg: vg_data
+      lv: lv_couchdb
+      size: 20%VG
+    
+  - name: create filesystem for /dev/vg_data/lv_postgresql
+    filesystem:
+      fstype: ext4
+      dev: /dev/vg_data/lv_postgresql
+    
+  - name: create filesystem for /dev/vg_data/lv_couchdb
+    filesystem:
+      fstype: ext4
+      dev: /dev/vg_data/lv_couchdb
+
+  - name: mount device /dev/vg_data/lv_postgres to path /var/lib/postgres
+    mount:
+      path: /var/lib/postgres
+      src: /dev/vg_data/lv_postgresql
+      fstype: ext4
+      state: mounted
+    
+  - name: mount device /dev/vg_data/lv_couchdb to path /var/lib/couchdb
+    mount:
+      path: "{{ sldata_couchdb_data_path }}"
+      src: /dev/vg_data/lv_couchdb
+      fstype: ext4
+      state: mounted
+
+- hosts: slelastic:!kibana
+  gather_facts: yes
+  become: yes
+ 
+  tasks:
+  - name: create partition for /dev/sdb
+    lvg:
+      vg: vg_data
+      pvs: /dev/sdb
+      state: present
+
+  - name: create elastic lvol
+    lvol:
+      vg: vg_data
+      lv: lv_elastic
+      size: 100%VG
+    
+  - name: create filesystem for /dev/vg_data/lv_elastic
+    filesystem:
+      fstype: ext4
+      dev: /dev/vg_data/lv_elastic
+
+  - name: mount device /dev/vg_data/lv_elastic to path {{ elastic_data_path }}
+    mount:
+      path: "{{ elastic_data_path }}"
+      src: /dev/vg_data/lv_elastic
+      fstype: ext4
+      state: mounted
+
+- hosts: slstatic
+  gather_facts: yes
+  become: yes
+ 
+  tasks:
+  - name: create vg
+    lvg:
+      vg: vg_data
+      pvs: /dev/sdb
+      state: present
+
+  - name: create lv_data vol
+    lvol:
+      vg: vg_data
+      lv: lv_data
+      size: 100%VG
+    
+  - name: create filesystem for /dev/vg_data/lv_data
+    filesystem:
+      fstype: ext4
+      dev: /dev/vg_data/lv_data
+
+  - name: mount device /dev/vg_data/lv_data to path /mnt/data
+    mount:
+      path: /mnt/data
+      src: /dev/vg_data/lv_data
+      fstype: ext4
+      state: mounted

@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars_files:
+    - roles/vmware/vars/vmware_vms.yml
+  
+  roles:
+    - role: vmware

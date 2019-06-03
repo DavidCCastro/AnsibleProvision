@@ -1,0 +1,345 @@
+---
+vmware_validate_certs: false
+vmware_template: slbase1
+vmware_folder: "{{ vm_folder }}"
+vmware_datastore: "{{ datastore }}"
+vmware_esx: "{{ esx_host }}"
+vmware_datacenter: "{{ datacenter }}"
+vmware_dns_server1: "{{ vm_dns1 }}"
+vmware_dns_server2: "{{ vm_dns2 }}"
+vmware_mask_servers: "{{ vm_mask }}"
+vmware_gateway_servers: "{{ vm_gateway }}"
+ip_flotante_rabbitmq: 192.1.1.236
+
+vmware_vms_simple_deployment:
+  slelastic01:
+    group: 
+      - slelastic
+    annotation: "Created from Ansible"
+    disk:
+    - size_gb: 40
+      type: thin
+    - size_gb: 300
+      type: thin
+    networks:
+    - name: VM Network
+      ip: 192.1.1.210
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 16384
+      num_cpus: 8
+  sldata01:
+    group:
+      - sldata
+    annotation: "Created from Ansible"
+    disk:
+    - size_gb: 40
+      type: thin
+    - size_gb: 300
+      type: thin
+    networks:
+    - name: VM Network
+      ip: 192.1.1.211
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 2
+  slcom01:
+    group: 
+      - slcomm
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.212
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 1
+  slrabbit01:
+    group: 
+      - slrabbit
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.213
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 1
+  slapp01:
+    group: 
+      - slapp
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.214
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 1
+  slwww01:
+    group: 
+      - slwww
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.215
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 1
+  slstatic01:
+    group: 
+      - slstatic
+    state: poweredon
+    annotation: "Created from Ansible"
+    disk:
+    - size_gb: 40
+      type: thin
+    - size_gb: 300
+      type: thin
+    networks:
+    - name: VM Network
+      ip: 192.1.1.216
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 1
+
+# Cluster deployment
+vmware_vms_cluster_deployment:
+  slelastic01:
+    group: 
+     - slelastic
+    annotation: "Created from Ansible"
+    disk:
+    - size_gb: 40
+      type: thin
+    - size_gb: 300
+      type: thin
+    networks:
+    - name: VM Network
+      ip: 192.1.1.210
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 16384
+      num_cpus: 8
+  slelastic02:
+    group: 
+      - slelastic
+    annotation: "Created from Ansible"
+    disk:
+    - size_gb: 40
+      type: thin
+    - size_gb: 300
+      type: thin
+    networks:
+    - name: VM Network
+      ip: 192.1.1.217
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 16384
+      num_cpus: 8
+  slkibana:
+    group:
+      - kibana
+      - slelastic
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.218
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 8192
+      num_cpus: 6
+  sldata01:
+    group: 
+      - sldata
+    annotation: "Created from Ansible"
+    disk:
+    - size_gb: 40
+      type: thin
+    - size_gb: 300
+      type: thin
+    networks:
+    - name: VM Network
+      ip: 192.1.1.211
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 8192
+      num_cpus: 6
+  sldata02:
+    group: 
+      - sldata
+    annotation: "Created from Ansible"
+    disk:
+    - size_gb: 40
+      type: thin
+    - size_gb: 300
+      type: thin
+    networks:
+    - name: VM Network
+      ip: 192.1.1.219
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 8192
+      num_cpus: 6
+  slbk:
+    group: 
+      - slbackup
+    annotation: "Created from Ansible"
+    disk:
+    - size_gb: 40
+      type: thin
+    - size_gb: 300
+      type: thin
+    networks:
+    - name: VM Network
+      ip: 192.1.1.220
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 2
+  slcom01:
+    group: 
+      - slcomm
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.212
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 12288
+      num_cpus: 12
+  slcom02:
+    group: 
+      - slcomm
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.221
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 12288
+      num_cpus: 12
+  slrabbit01:
+    group: 
+      - slrabbit
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.213
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 6
+  slrabbit02:
+    group: 
+      - slrabbit
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.222
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 6
+  slapp01:
+    group: 
+      - slapp
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.214
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 12288
+      num_cpus: 12
+  slapp02:
+    group: 
+      - slapp
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.223
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 12288
+      num_cpus: 12
+  slwww01:
+    group: 
+      - slwww
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.215
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 4
+  slwww02:
+    group: 
+      - slwww
+    annotation: "Created from Ansible"
+    networks:
+    - name: VM Network
+      ip: 192.1.1.224
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 4
+  slstatic01:
+    group: 
+      - slstatic
+    annotation: "Created from Ansible"
+    disk:
+    - size_gb: 40
+      type: thin
+    - size_gb: 300
+      type: thin
+    networks:
+    - name: VM Network
+      ip: 192.1.1.216
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 2
+  slstatic02:
+    group: 
+      - slstatic
+    annotation: "Created from Ansible"
+    disk:
+    - size_gb: 40
+      type: thin
+    - size_gb: 300
+      type: thin
+    networks:
+    - name: VM Network
+      ip: 192.1.1.225
+      netmask: "{{ vm_mask }}"
+      gateway: "{{ vm_gateway }}"
+    hardware:
+      memory_mb: 4096
+      num_cpus: 2

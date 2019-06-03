@@ -1,0 +1,7 @@
+- name: deploy slwww
+  gather_facts: true
+  hosts: slwww
+  become: true
+  become_user: root
+  roles:
+    - slwww

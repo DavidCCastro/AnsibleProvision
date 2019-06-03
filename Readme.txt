@@ -1,0 +1,1 @@
+Smartlis provision through ansible

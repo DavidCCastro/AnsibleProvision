@@ -1,0 +1,29 @@
+---
+
+#
+# Common variables for all groups
+#
+
+deployment_type: "simple"
+postgres_version: 9.5
+
+slwww_fqdn: "slwww01"
+slwww_keepalived_ip: "192.1.1.231"
+slwww_keepalived_cidr: "{{ slwww_keepalived_ip }}/24"
+
+smartlis_user: smartlis
+smartlis_group: smartlis
+
+postgres_user: "{{ postgres_user }}"
+postgres_pass: "{{ postgres_pass }}"
+postgres_host: "{{ groups['sldata'][0] }}"
+
+couchdb_user: "{{ couchdb_user }}"
+couchdb_pass: "{{ postgres_pass }}"
+
+broker_host: "slrabbit01" #rabbitmq floating ip
+broker_user: "guest"
+broker_pass: "guest"
+
+elastic_data_path: /mnt/data/elasticsearch
+sldata_couchdb_data_path: /var/lib/couchdb

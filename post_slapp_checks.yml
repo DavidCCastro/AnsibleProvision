@@ -1,0 +1,49 @@
+---
+- hosts: localhost
+  tasks:
+  
+  - name: ping keepalive ip
+    ping:
+    delegate_to: "{{ slwww_keepalived_ip }}"
+    
+  - name: check elastic url
+    uri:
+      url: http://{{ slwww_keepalived_ip }}:9200
+      status_code: 200
+    when: deployment_type == "simple"
+    
+  - name: check elastic cluster status
+    uri:
+      url: http://{{ slwww_keepalived_ip }}:9200/_cluster/health
+      status_code: 200
+    register: response_elastic
+    until: response_elastic.json.status == 'green'
+    delay: 10
+    when: deployment_type == "cluster"
+    
+  - name: check couchdb status
+    uri:
+      url: http://{{ slwww_keepalived_ip }}:5984
+    register: response_couchdb
+    until: response_couchdb.json.couchdb == 'Welcome'
+    
+  - name: check kibana status
+    uri:
+      url: http://{{ slwww_keepalived_ip }}:5601
+      status_code: 403
+    when: deployment_type == "cluster"
+    
+  - name: check redis ports
+    wait_for:
+      host: localhost
+      port: "{{ item[1] }}"
+      delay: 1
+      timeout: 10
+    loop: "{{ groups['slapp']|product(['6379', '6380'])|list }}"
+    delegate_to: "{{ item[0] }}"
+    
+  - name: check smartlis url
+    uri:
+      url: http://{{ slwww_keepalived_ip }}/system/about/
+    
+    

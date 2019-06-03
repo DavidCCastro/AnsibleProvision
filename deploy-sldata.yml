@@ -1,0 +1,9 @@
+- name: deploy
+  gather_facts: true
+  hosts: sldata
+  become: true
+  become_user: root
+  vars_files:
+    - sldata_vault.yml 
+  roles:
+    - sldata

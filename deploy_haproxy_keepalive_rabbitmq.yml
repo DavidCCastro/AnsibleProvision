@@ -1,0 +1,9 @@
+- name: install haproxy and keepalive
+  hosts: slrabbit
+  become: yes
+  become_user: root
+  remote_user: smartlis
+  vars_files:
+    - roles/haproxy-keepalive-rabbitmq/vars/haproxy-keepalive-rabbitmq.yml
+  roles:
+    - haproxy-keepalive-rabbitmq

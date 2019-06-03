@@ -1,0 +1,7 @@
+- name: deploy
+  #gather_facts: true
+  hosts: slbk
+  become: true
+  become_user: root
+  roles:
+    - slbk

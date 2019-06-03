@@ -1,0 +1,10 @@
+---
+
+- name: deploy slstatic
+  gather_facts: true
+  hosts: slstatic
+  become: true
+  become_user: root
+  roles:
+    - pip
+    - slstatic

@@ -1,0 +1,25 @@
+---
+
+#
+# this variables should override the
+# ones in elastic group
+# this happen because slelastic
+# precede alphabetically slkibana
+# so slkibana variables are overriding
+# slelastic ones
+#
+
+#
+# This conditional will configure
+# elastic instance in kibana machine
+# to be master and data only in a
+# simple installation.
+# When slelastic group is composed by
+# only one member and deployment_type
+# is simple.
+# If the only elastic instance is
+# in kibana machine then this elastic
+# should be both master and data.
+#
+elastic_node_data: "{% if (groups['slelastic'] | length  > 1 and deployment_type != \"simple\") %}false{% else %}true{% endif %}"
+elastic_node_master: "{% if (groups['slelastic'] | length > 1 and deployment_type != \"simple\") %}false{% else %}true{% endif %}"

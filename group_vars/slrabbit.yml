@@ -1,0 +1,5 @@
+---
+slrabbit_repo_key: http://www.rabbitmq.com/rabbitmq-release-signing-key.asc
+slrabbit_repo_source: "deb http://www.rabbitmq.com/debian/ testing main"
+slrabbit_apt_packages:
+  - rabbitmq-server=3.6.15-1

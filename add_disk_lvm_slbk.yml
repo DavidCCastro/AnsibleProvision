@@ -1,0 +1,29 @@
+---
+- hosts: slbackup
+  gather_facts: yes
+  become: yes
+ 
+  tasks:
+  - name: create partition for /dev/sdb
+    lvg:
+      vg: vg_data
+      pvs: /dev/sdb
+      state: present
+
+  - name: create backups lvol
+    lvol:
+      vg: vg_data
+      lv: lv_backups
+      size: 100%VG
+    
+  - name: create filesystem for /dev/vg_data/lv_backups
+    filesystem:
+      fstype: ext4
+      dev: /dev/vg_data/lv_backups
+
+  - name: mount device /dev/vg_data/lv_backups to path /mnt/backups
+    mount:
+      path: /mnt/backups
+      src: /dev/vg_data/lv_backups
+      fstype: ext4
+      state: mounted

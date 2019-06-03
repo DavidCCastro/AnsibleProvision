@@ -1,0 +1,9 @@
+---
+
+- name: deploy elastic
+  gather_facts: true
+  hosts: slelastic
+  become: true
+  become_user: root
+  roles:
+    - slelastic

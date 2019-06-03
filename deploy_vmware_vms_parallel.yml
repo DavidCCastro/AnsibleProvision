@@ -1,0 +1,36 @@
+- name: inventory
+  hosts: localhost
+  vars_files:
+    - vars/{{ hospital }}/vmware_vms.yml
+  tasks:
+  - name: Add host to group
+    add_host:
+      name: "{{ item.key }}"
+      groups: simple
+      annotation: "{{ item.value.annotation }}"
+      disk: "{{ item.value.disk | default(omit) }}"
+      networks: "{{ item.value.networks | default(omit) }}"
+      hardware: "{{ item.value.hardware | default(omit) }}"
+      group_name: "{{ item.value.group | default(omit) }}"
+    loop: "{{ vmware_vms_simple_deployment | dict2items }}"
+    when: deployment_type == "simple"
+  - name: Add host to group
+    add_host:
+      name: "{{ item.key }}"
+      groups: cluster
+      annotation: "{{ item.value.annotation }}"
+      disk: "{{ item.value.disk | default(omit) }}"
+      networks: "{{ item.value.networks | default(omit) }}"
+      hardware: "{{ item.value.hardware | default(omit) }}"
+      group_name: "{{ item.value.group | default(omit) }}"
+    loop: "{{ vmware_vms_cluster_deployment | dict2items }}"
+    when: deployment_type == "cluster"
+    
+- name: VM Creation
+  hosts: "{{ deployment_type }}"
+  gather_facts: false
+  vars_files:
+    - vars/{{ hospital }}/vmware_vms.yml
+
+  roles:
+    - vmware_new

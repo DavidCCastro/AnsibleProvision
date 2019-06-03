@@ -1,0 +1,43 @@
+- name: inventory
+  hosts: localhost
+  vars_files:
+    - roles/vmware/vars/vmware_vms.yml
+  tasks:
+  - name: Add host to group
+    add_host:
+      name: "{{ item.key }}"
+      groups: jordi_inventory
+      annotation: "{{ item.value.annotation }}"
+      disk: "{{ item.value.disk | default(omit) }}"
+      networks: "{{ item.value.networks | default(omit) }}"
+      hardware: "{{ item.value.hardware | default(omit) }}"
+    loop: "{{ vmware_vms_cluster_deployment | dict2items }}"
+    
+- name: VM Creation
+  hosts: jordi_inventory
+  gather_facts: false
+  vars_files:
+    - roles/vmware/vars/vmware_vms.yml
+  tasks:
+  - name: create vm
+    vmware_guest:
+      hostname: 192.1.1.130
+      username: inf\ansible
+      password: "{{ vmware_password }}"
+      validate_certs: false
+      datacenter: Taller
+      folder: Smartlis
+      name: "{{ hostvars[inventory_hostname] }}"
+      state: poweredon
+      annotation: "{{ hostvars[inventory_hostname]['annotation'] }}"
+      disk: "{{ hostvars[inventory_hostname]['disk'] | default(omit) }}"
+      datastore: SL_SAN
+      networks: "{{ hostvars[inventory_hostname]['networks'] }}"
+      hardware: "{{ hostvars[inventory_hostname]['hardware'] }}"
+      customization:
+        dns_servers: 
+          - 192.1.1.100
+          - 80.58.61.250
+      template: slbase1
+      wait_for_ip_address: yes
+    delegate_to: localhost

@@ -1,0 +1,10 @@
+---
+
+- name: deploy kibana
+  gather_facts: true
+  hosts: slkibana
+  become: true
+  become_user: root
+  roles:
+    - slelastic
+    - slkibana

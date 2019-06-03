@@ -1,0 +1,25 @@
+- hosts: Smartlis
+  gather_facts: yes
+  become: yes
+  
+  tasks:
+  - name: create partition for /dev/sdb
+    parted:
+      device: /dev/sdb
+      number: 1
+      state: present
+    when: ansible_devices.sdb is defined
+
+  - name: create filesystem for /dev/sdb1
+    filesystem:
+      fstype: ext4
+      dev: /dev/sdb1
+    when: ansible_devices.sdb is defined
+
+  - name: mount device /dev/sdb1 to path /mnt/data
+    mount:
+      path: /mnt/data
+      src: /dev/sdb1
+      fstype: ext4
+      state: mounted
+    when: ansible_devices.sdb is defined

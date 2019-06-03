@@ -1,0 +1,12 @@
+# This will init db only if they are not initialized
+smartlis_backend_db_init: true
+
+smartlis_backend_version: 4.2
+smartlis_backend_patch: "_latest"
+
+redis_version: 4.0.6
+redis_verify_checksum: true
+
+redis_enabled_instances_port:
+  - 6379
+  - 6380

@@ -1,0 +1,11 @@
+---
+
+- name: deploy slapp
+  gather_facts: true
+  hosts: slapp
+  become: true
+  become_user: root
+  roles:
+    - pip
+    - ansible-redis
+    - slapp

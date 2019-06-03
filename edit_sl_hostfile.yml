@@ -1,0 +1,13 @@
+---
+- hosts: Smartlis
+  become: yes
+  vars_files:
+    - roles/vmware/vars/vmware_vms.yml
+
+  tasks:
+  - name: Update sl servers /etc/hosts file
+    lineinfile:
+      path: /etc/hosts
+      line: "{{ item.value.networks[0].ip }}   {{ item.key }}"
+      state: present
+    loop: "{{ lookup('dict', vmware_vms_cluster_deployment) }}"

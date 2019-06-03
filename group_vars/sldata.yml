@@ -1,0 +1,97 @@
+---
+#!!!!!!!!!!!!DELETE CURRENT POSTGRESQL !!!!!!!!!!!!!1
+sldata_postgres_delete_currentDB: "{{ reinitialize_db }}"
+ 
+
+# POSTGRES INSTALLATION VARS 
+
+sldata_postgres_repo_key: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+sldata_postgres_repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+sldata_postgres_version: 9.5
+sldata_postgres_cluster: main
+sldata_postgres_user: smartlis
+sldata_psycopg_version: python-psycopg2 
+
+# POSTGRES CONFIGURATION VARS
+
+sldata_psql_user_role: CREATEDB
+sldata_network_cidr: "{{ ansible_default_ipv4.network }}/{{ (ansible_default_ipv4.address + '/' + ansible_default_ipv4.netmask) | ipaddr('prefix') }}"
+sldata_psql_subnet_connections: 
+  - { type: host,  database: all,  user: smartlis,      address: "{{ sldata_network_cidr }}" , method: password, comment: 'IPv4 local connections:' }
+
+sldata_psql_data_path: "/var/lib/postgresql/9.5/main"
+sldata_psql_conf_path: "/etc/postgresql/9.5/main"
+sldata_psql_owner: postgres
+sldata_psql_group: postgres
+
+sldata_psql_listen_addresses: '*'
+sldata_psql_max_connections: 2000
+
+# COUCHDB DEPENDENCIES
+sldata_erlang_version: 1:17.5.3 
+sldata_erlang_pkgs: 
+  - erlang-base
+  - erlang-dev
+  - erlang-crypto
+  - erlang-syntax-tools
+  - erlang-asn1
+  - erlang-public-key
+  - erlang-ssh
+  - erlang-ssl
+  - erlang-mnesia
+  - erlang-runtime-tools
+  - erlang-inets
+  - erlang-percept
+  - erlang-xmerl
+  - erlang-edoc
+  - erlang-erl-docgen
+  - erlang-inviso
+  - erlang-corba
+  - erlang-snmp
+  - erlang-os-mon
+  - erlang-diameter
+  - erlang-webtool
+  - erlang-eldap
+  - erlang-tools
+  - erlang-eunit
+  - erlang-ic
+  - erlang-odbc
+  - erlang-parsetools
+  - erlang-nox
+sldata_erlang_repo: "deb https://packages.erlang-solutions.com/debian jessie contrib"
+sldata_erlang_repo_key: https://packages.erlang-solutions.com/debian/erlang_solutions.asc
+sldata_couch_dependencies:
+  - build-essential 
+  - libmozjs185-dev 
+  - libcurl4-openssl-dev 
+  - libicu-dev
+  
+#COUCHDB INSTALLATION
+sldata_couchdb_paths:
+  - /usr/local/lib/couchdb
+  - /usr/local/etc/couchdb
+  - /usr/local/var/lib/couchdb
+  - /usr/local/var/log/couchdb
+  - /usr/local/var/run/couchdb
+  - /var/lib/couchdb
+
+sldata_couchdb_group: couchdb
+sldata_couchdb_user: couchdb
+sldata_couchdb_url_src: "{{ pydio_couchdb_url }}"
+sldata_couchdb_download_folder: /home/smartlis/
+sldata_couchdb_configure_installer: "--prefix=/usr/local --with-js-lib=/usr/lib --with-js-include=/usr/include/js --enable-init"
+
+#COUCHDB CONFIGURATION
+
+sldata_couchdb_data_path: /var/lib/couchdb
+sldata_couchdb_app_folder: /usr/local/etc/couchdb
+sldata_couchdb_start_script: /usr/local/etc/init.d/couchdb
+sldata_couchdb_init_d: /etc/init.d/couchdb
+sldata_couchdb_pass : "{{ psql_user_pass }}"
+sldata_couchdb_bind_address: '0.0.0.0'
+sldata_couchdb_compaction_daemon: '{couch_compaction_daemon, start_link, []}'
+sldata_couchdb_autocompaction_conf: '_default = [{db_fragmentation, "20%"}, {view_fragmentation, "20%"}, {from, "23:00"}, {to, "04:00"}]'
+#sldata_couchdb_local_ini_vars:
+#  - { bind_address: '0.0.0.0' , compaction_daemon: '{couch_compaction_daemon, start_link, []}' , autocompaction_conf: '_default = [{db_fragmentation, "20%"}, {view_fragmentation, "20%"}, {from, "23:00"}, {to, "04:00"}]' }
+
+sldata_logrotate_folder: /etc/logrotate.d

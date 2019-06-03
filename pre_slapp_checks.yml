@@ -1,0 +1,48 @@
+- hosts: localhost
+  
+  tasks:
+  - name: ping all SL servers
+    ping:
+    loop: "{{ groups['Smartlis'] }}"
+
+  - name: check db ports
+    wait_for:
+      host: "{{ item[0] }}"
+      port: "{{ item[1] }}"
+      delay: 1
+      timeout: 10
+    loop: "{{ groups['sldata']|product(['5984', '5432'])|list }}"
+
+  - name: check elastic port
+    wait_for:
+      host: "{{ item }}"
+      port: 9200
+      delay: 1
+      timeout: 10
+    loop: "{{ groups['slelastic'] }}"
+    
+  - name: check rabbitmq ports
+    wait_for:
+      host: "{{ item[0] }}"
+      port: "{{ item[1] }}"
+      delay: 1
+      timeout: 10
+    loop: "{{ groups['slrabbit']|product(['15672', '5672'])|list }}"
+    when: deployment_type == "simple"
+    
+  - name: check rabbitmq cluster ports
+    wait_for:
+      host: "{{ item[0] }}"
+      port: "{{ item[1] }}"
+      delay: 1
+      timeout: 10
+    loop: "{{ groups['slrabbit']|product(['15672', '5672', '5673'])|list }}"
+    when: deployment_type == "cluster"
+    
+  - name: check slwww ports
+    wait_for:
+      host: "{{ item[0] }}"
+      port: "{{ item[1] }}"
+      delay: 1
+      timeout: 10
+    loop: "{{ groups['slwww']|product(['80', '9200', '5984', '5601'])|list }}"

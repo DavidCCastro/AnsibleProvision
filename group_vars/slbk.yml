@@ -1,0 +1,28 @@
+---
+#SLBK VARIABLES
+
+slbk_dependencies:
+  - "postgresql-{{ postgres_version }}"
+  - nfs-kernel-server
+  - nfs-common
+
+slbk_user: smartlis
+slbk_group: smartlis
+
+slbk_sldata_master: sldata01
+
+slbk_folders_permission:
+  - folder: "/mnt/backups/incremental_transactions/"
+    owner: postgres
+    group_owner: postgres
+  - folder: "/mnt/bakcups/weekly_BK"
+    owner: "{{ slbk_user }}"
+    group_owner: "{{ slbk_group }}"
+  - folder: "/mnt/backups/logs_weekly_BK"
+    owner: "{{ slbk_user }}"
+    group_owner: "{{ slbk_group }}"
+  - folder: "/mnt/backups/logs_clean_transactions"
+    owner: "{{ slbk_user }}"
+    group_owner: "{{ slbk_group }}"
+
+slbk_config_export_unit: "(rw,nohide,insecure,no_subtree_check,async)"
