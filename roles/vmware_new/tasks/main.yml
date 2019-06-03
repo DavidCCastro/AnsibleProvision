@@ -1,0 +1,10 @@
+---
+- name: Import deployment tasks file
+  import_tasks: "deployment.yml"
+  
+- name: Import tower group creation tasks file
+  import_tasks: "create_tower_group.yml"
+  delegate_to: localhost
+  
+- name: Import edit hostfile task
+  import_tasks: "edit_isolated_hostfile_{{ deployment_type }}.yml"

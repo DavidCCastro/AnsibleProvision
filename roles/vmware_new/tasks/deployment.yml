@@ -1,0 +1,24 @@
+---
+# Create a VM from a template
+- name: Creating VMs
+  vmware_guest:
+#   hostname:
+#   username:
+#   password:
+    validate_certs: "{{ vmware_validate_certs }}"
+    datacenter: "{{ vmware_datacenter }}"
+    folder: "{{ vmware_folder }}"
+    name: "{{ inventory_hostname }}"
+    state: poweredon
+    annotation: "{{ hostvars[inventory_hostname]['annotation'] }}"
+    disk: "{{ hostvars[inventory_hostname]['disk'] | default(omit) }}"
+    datastore: "{{ datastore }}"
+    networks: "{{ hostvars[inventory_hostname]['networks'] }}"
+    hardware: "{{ hostvars[inventory_hostname]['hardware'] }}"
+    customization:
+      dns_servers:
+        - "{{ vmware_dns_server1 }}"
+        - "{{ vmware_dns_server2 }}"
+    template: "{{ vmware_template }}"
+    wait_for_ip_address: yes
+  delegate_to: localhost

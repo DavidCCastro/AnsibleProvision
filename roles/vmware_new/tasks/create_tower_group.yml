@@ -1,0 +1,42 @@
+---
+- name: Create Smartlis tower group
+  tower_group:
+    inventory: "{{ hospital }}"
+    name: Smartlis
+    state: present
+    tower_host: 
+    tower_username: 
+    tower_password: 
+  run_once: true
+
+- name: Create slservers tower group
+  tower_group:
+    inventory: "{{ hospital }}"
+    name: "{{ item }}"
+    state: present
+    tower_host: 
+    tower_username: 
+    tower_password: 
+  loop: "{{ hostvars[inventory_hostname]['group_name'] }}"
+  ignore_errors: yes
+    
+- name: Add sl servers to group
+  tower_host:
+    tower_host: 
+    tower_username: 
+    tower_password: 
+    name: "{{ inventory_hostname }}"
+    groups: "{{ item }}"
+    inventory: "{{ hospital }}"
+    state: present
+  loop: "{{ hostvars[inventory_hostname]['group_name'] }}"
+  
+- name: Add sl servers to Smartlis group
+  tower_host:
+    tower_host: 
+    tower_username: 
+    tower_password: 
+    name: "{{ inventory_hostname }}"
+    groups: Smartlis
+    inventory: "{{ hospital }}"
+    state: present
