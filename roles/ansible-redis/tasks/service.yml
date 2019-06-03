@@ -1,0 +1,15 @@
+---
+
+- name: "[Slapp] | Enable redis instances"
+  systemd:
+    name: "redis@{{ item }}.service"
+    enabled: true
+  loop: "{{ redis_enabled_instances_port }}"
+
+- name: "[Slapp] | Start redis instances"
+  become: yes
+  become_user: root
+  systemd:
+    name: "redis@{{ item }}.service"
+    state: started
+  loop: "{{ redis_enabled_instances_port }}"

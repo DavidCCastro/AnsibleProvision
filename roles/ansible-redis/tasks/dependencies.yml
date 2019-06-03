@@ -1,0 +1,10 @@
+---
+
+- name: install debian dependencies
+  apt:
+    name:
+      - gcc
+      - make
+      - libc6-dev
+    update_cache: yes
+    state: present

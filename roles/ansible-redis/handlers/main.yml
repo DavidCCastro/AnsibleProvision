@@ -1,0 +1,12 @@
+---
+
+- name: reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: redis restart
+  systemd:
+    name: "redis@{{ item.item }}"
+    state: restarted
+  loop: "{{ redis_configs.results }}"
+  when: "{{ item.changed }}"

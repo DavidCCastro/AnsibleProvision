@@ -1,0 +1,12 @@
+---
+
+- import_tasks: check_vars.yml
+- import_tasks: dependencies.yml
+- import_tasks: download.yml
+  when: redis_install_flag|bool
+- import_tasks: install.yml
+  when: redis_install_flag|bool
+- import_tasks: configure.yml
+- import_tasks: service.yml
+
+

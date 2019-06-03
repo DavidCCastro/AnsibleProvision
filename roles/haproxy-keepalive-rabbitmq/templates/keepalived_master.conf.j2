@@ -1,0 +1,25 @@
+vrrp_script chk_haproxy {
+			script "killall -0 haproxy"
+			interval 2
+	}
+
+	vrrp_instance VI_1 {
+			interface ens160
+			state MASTER
+			priority 150
+
+			virtual_router_id 33
+
+			virtual_ipaddress {
+					{{ ip_flotante_rabbitmq }}
+			}
+
+			authentication {
+					auth_type PASS
+					auth_pass {{ keepalived_auth_pass }}
+			}
+			track_script {
+					chk_haproxy
+			}
+
+	}

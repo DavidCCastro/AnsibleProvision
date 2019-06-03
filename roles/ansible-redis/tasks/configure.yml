@@ -1,0 +1,23 @@
+---
+
+- name: "[Slapp] | Install redis systemd service"
+  template:
+    src: "redis@.service.j2"
+    dest: "/etc/systemd/system/redis@.service"
+  notify: reload systemd
+
+- name: "[Slapp] | Install redis confs"
+  template:
+    src: "{{ item }}.conf"
+    dest: "/etc/redis/{{ item }}.conf"
+  loop: "{{ redis_enabled_instances_port }}"
+  register: redis_configs
+  notify: redis restart
+
+- name: create redis working directory
+  file:
+    path: "{{ redis_dir }}/{{ item }}"
+    state: directory
+    recurse: yes
+    owner: "{{ redis_user }}"
+  loop: "{{ redis_enabled_instances_port }}"

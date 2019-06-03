@@ -1,0 +1,29 @@
+#
+# %i should be the port name
+# configuration at /etc/redis/%i.conf
+#
+[Unit]
+Description=Redis
+After=network.target
+PartOf=redis.target
+
+[Service]
+Type=simple
+User=redis
+Group=redis
+PIDFile={{ redis_pid_dir }}/%i.pid
+ExecStart={{ redis_install_dir }}/bin/redis-server /etc/redis/%i.conf
+ExecStop={{ redis_install_dir }}/bin/redis-cli -p %i shutdown
+Restart=on-failure
+# CapabilityBoundingSet=
+PrivateTmp=true
+# PrivateDevices=true
+# ProtectSystem=full
+# ProtectHome=true
+# NoNewPrivileges=true
+# RuntimeDirectory=redis
+# RuntimeDirectoryMode=755
+# LimitNOFILE=10032
+
+[Install]
+WantedBy=multi-user.target redis.target

@@ -1,0 +1,14 @@
+---
+- name: configure keepalived master
+  template:
+    src: keepalived_master.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+  when: ansible_hostname == groups['slrabbit'][0]
+  notify: restart keepalived
+  
+- name: configure keepalived slave
+  template:
+    src: keepalived_slave.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+  when: ansible_hostname == groups['slrabbit'][1]
+  notify: restart keepalived

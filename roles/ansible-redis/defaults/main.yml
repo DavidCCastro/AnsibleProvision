@@ -1,0 +1,19 @@
+---
+## Installation options
+redis_version: 2.8.24
+redis_install_dir: /usr/local
+redis_dir: /var/lib/redis
+redis_log_dir: /var/log/redis
+redis_pid_dir: /var/run/redis
+redis_download_url: "http://download.redis.io/releases/redis-{{ redis_version }}.tar.gz"
+# Set this to true to validate redis tarball checksum against vars/main.yml
+redis_verify_checksum: true
+# Set this value to a local path of a tarball to use for installation instead of downloading
+redis_tarball: false
+redis_daemonize: "no"
+
+redis_user: redis
+redis_group: "{{ redis_user }}"
+
+redis_install_flag: false
+

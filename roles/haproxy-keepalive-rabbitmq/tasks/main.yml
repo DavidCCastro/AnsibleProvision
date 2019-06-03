@@ -1,0 +1,5 @@
+---
+- import_tasks: install_haproxy_rabbitmq.yml
+- import_tasks: configure_haproxy_rabbitmq.yml
+- import_tasks: install_keepalive.yml
+- import_tasks: configure_keepalive.yml

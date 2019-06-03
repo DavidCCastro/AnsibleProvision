@@ -1,0 +1,42 @@
+---
+
+- name: check for ansible 1.x
+  fail:
+    msg: >
+      This role no longer supports Ansible 1.x. The last known good tag
+      for Ansible 1.x support in this role is 1.2.5.
+  when:
+    - ansible_version.major < 2
+
+- name: check for checksum
+  fail:
+    msg: >
+      There is no sha1 checksum defined for version {{ redis_version }} in
+      vars/main.yml. Set redis_checksum manually or submit a PR to add this
+      version.
+  when:
+    - redis_verify_checksum|bool
+    - redis_checksum is not defined
+    - redis_version not in redis_checksums
+
+- name: check redis version
+  command: "redis-server --version"
+  register: redis_version_out
+  changed_when: false
+  failed_when: false
+
+# This regex gets the version: non space characters after v=
+- name: set redis_installed_version
+  set_fact:
+    redis_installed_version: "{{ redis_version_out.stdout | regex_replace('.*?v=([0-9].*?) .*', '\\1')}}"
+  when: redis_version_out.rc == 0
+
+- name: decide if redis should be updated
+  set_fact:
+    redis_install_flag: true
+  when: redis_version_out.rc == 0 and redis_installed_version != redis_version
+
+- name: decide if redis should be installed
+  set_fact:
+    redis_install_flag: true
+  when: redis_version_out.rc != 0

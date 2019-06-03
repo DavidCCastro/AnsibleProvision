@@ -1,0 +1,5 @@
+---
+keepalive_packages:
+  - build-essential
+  - libssl-dev
+  - keepalived #1.3.2-1
